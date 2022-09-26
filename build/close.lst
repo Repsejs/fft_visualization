@@ -1,0 +1,227 @@
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s 			page 1
+
+
+   1              		.file	"close.c"
+   2              		.option nopic
+   3              		.attribute arch, "rv32i2p0_m2p0_a2p0_c2p0"
+   4              		.attribute unaligned_access, 0
+   5              		.attribute stack_align, 16
+   6              		.text
+   7              	.Ltext0:
+   8              		.cfi_sections	.debug_frame
+   9              		.section	.text._close,"ax",@progbits
+  10              		.align	1
+  11              		.globl	_close
+  13              	_close:
+  14              	.LFB1:
+  15              		.file 1 "../../firmware/RISCV/stubs/close.c"
+   1:../../firmware/RISCV/stubs/close.c **** /* See LICENSE of license details. */
+   2:../../firmware/RISCV/stubs/close.c **** 
+   3:../../firmware/RISCV/stubs/close.c **** #include <errno.h>
+   4:../../firmware/RISCV/stubs/close.c **** #include "stub.h"
+   5:../../firmware/RISCV/stubs/close.c **** 
+   6:../../firmware/RISCV/stubs/close.c **** int _close(int fd)
+   7:../../firmware/RISCV/stubs/close.c **** {
+  16              		.loc 1 7 1
+  17              		.cfi_startproc
+  18              	.LVL0:
+   8:../../firmware/RISCV/stubs/close.c ****   return _stub(EBADF);
+  19              		.loc 1 8 3
+  20              		.file 2 "../../firmware/RISCV/stubs/stub.h"
+   1:../../firmware/RISCV/stubs/stub.h **** /* See LICENSE of license details. */
+   2:../../firmware/RISCV/stubs/stub.h **** #ifndef _NUCLEI_SYS_STUB_H
+   3:../../firmware/RISCV/stubs/stub.h **** #define _NUCLEI_SYS_STUB_H
+   4:../../firmware/RISCV/stubs/stub.h **** 
+   5:../../firmware/RISCV/stubs/stub.h **** #include <stdint.h>
+   6:../../firmware/RISCV/stubs/stub.h **** #if   defined (__GNUC__)
+   7:../../firmware/RISCV/stubs/stub.h **** #include <unistd.h>
+   8:../../firmware/RISCV/stubs/stub.h **** #endif
+   9:../../firmware/RISCV/stubs/stub.h **** 
+  10:../../firmware/RISCV/stubs/stub.h **** void write_hex(int fd, unsigned long int hex);
+  11:../../firmware/RISCV/stubs/stub.h **** 
+  12:../../firmware/RISCV/stubs/stub.h **** static inline int _stub(int err)
+  13:../../firmware/RISCV/stubs/stub.h **** {
+  14:../../firmware/RISCV/stubs/stub.h ****   return -1;
+  21              		.loc 2 14 3
+   9:../../firmware/RISCV/stubs/close.c **** }
+  22              		.loc 1 9 1 is_stmt 0
+  23 0000 7D55     		li	a0,-1
+  24              	.LVL1:
+  25 0002 8280     		ret
+  26              		.cfi_endproc
+  27              	.LFE1:
+  29              		.text
+  30              	.Letext0:
+  31              		.file 3 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\lib\\gcc\\riscv64-unknown-elf
+  32              		.file 4 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+  33              		.file 5 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+  34              		.file 6 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+  35              		.file 7 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+  36              		.file 8 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s 			page 2
+
+
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 close.c
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:13     .text._close:0000000000000000 _close
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:17     .text._close:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:19     .text._close:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:21     .text._close:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:22     .text._close:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:23     .text._close:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:26     .text._close:0000000000000004 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:29     .text._close:0000000000000004 .L0 
+                     .debug_frame:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:1540   .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2208   .debug_str:00000000000002da .LASF128
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2288   .debug_str:00000000000004b1 .LASF129
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2088   .debug_str:0000000000000076 .LASF130
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2060   .debug_ranges:0000000000000000 .Ldebug_ranges0
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2066   .debug_line:0000000000000000 .Ldebug_line0
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2158   .debug_str:00000000000001f3 .LASF0
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2098   .debug_str:00000000000000df .LASF1
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2202   .debug_str:00000000000002c0 .LASF2
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2186   .debug_str:0000000000000281 .LASF10
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2100   .debug_str:00000000000000ed .LASF3
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2222   .debug_str:0000000000000393 .LASF4
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2228   .debug_str:00000000000003af .LASF5
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2172   .debug_str:0000000000000236 .LASF6
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2116   .debug_str:0000000000000132 .LASF7
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2166   .debug_str:0000000000000217 .LASF8
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2082   .debug_str:000000000000004b .LASF9
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2216   .debug_str:0000000000000370 .LASF11
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2274   .debug_str:0000000000000481 .LASF12
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2308   .debug_str:000000000000052c .LASF13
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2182   .debug_str:0000000000000273 .LASF14
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2160   .debug_str:0000000000000200 .LASF15
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2266   .debug_str:000000000000045f .LASF16
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2268   .debug_str:0000000000000467 .LASF17
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2238   .debug_str:00000000000003d7 .LASF18
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2294   .debug_str:00000000000004e2 .LASF19
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2220   .debug_str:0000000000000381 .LASF20
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2144   .debug_str:00000000000001b6 .LASF21
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2148   .debug_str:00000000000001c7 .LASF26
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2286   .debug_str:00000000000004ab .LASF22
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2260   .debug_str:000000000000044a .LASF23
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2142   .debug_str:00000000000001b0 .LASF24
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2302   .debug_str:0000000000000517 .LASF25
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2156   .debug_str:00000000000001ee .LASF27
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2096   .debug_str:00000000000000d6 .LASF28
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2280   .debug_str:0000000000000495 .LASF29
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2106   .debug_str:0000000000000105 .LASF30
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2332   .debug_str:0000000000000597 .LASF31
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2210   .debug_str:0000000000000354 .LASF32
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2196   .debug_str:00000000000002a6 .LASF33
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2304   .debug_str:000000000000051c .LASF34
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2230   .debug_str:00000000000003b9 .LASF35
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2318   .debug_str:0000000000000557 .LASF36
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2110   .debug_str:0000000000000114 .LASF37
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2138   .debug_str:00000000000001a3 .LASF38
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2068   .debug_str:0000000000000000 .LASF39
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s 			page 4
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2290   .debug_str:00000000000004d4 .LASF40
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2120   .debug_str:0000000000000142 .LASF41
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2212   .debug_str:000000000000035d .LASF42
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2252   .debug_str:000000000000041a .LASF43
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2140   .debug_str:00000000000001ab .LASF44
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2232   .debug_str:00000000000003c3 .LASF45
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2104   .debug_str:00000000000000ff .LASF46
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2070   .debug_str:000000000000000c .LASF47
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2240   .debug_str:00000000000003e2 .LASF48
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2118   .debug_str:000000000000013b .LASF49
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2168   .debug_str:0000000000000229 .LASF50
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2084   .debug_str:0000000000000062 .LASF51
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2112   .debug_str:0000000000000122 .LASF52
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2152   .debug_str:00000000000001de .LASF53
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2194   .debug_str:000000000000029f .LASF54
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2270   .debug_str:000000000000046f .LASF55
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2322   .debug_str:0000000000000571 .LASF56
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2102   .debug_str:00000000000000f9 .LASF57
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2314   .debug_str:0000000000000549 .LASF58
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2124   .debug_str:0000000000000151 .LASF59
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2130   .debug_str:000000000000016f .LASF60
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2076   .debug_str:0000000000000025 .LASF61
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2188   .debug_str:0000000000000288 .LASF62
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2244   .debug_str:00000000000003f4 .LASF63
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2190   .debug_str:000000000000028e .LASF64
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2262   .debug_str:0000000000000452 .LASF65
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2276   .debug_str:0000000000000489 .LASF66
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2122   .debug_str:000000000000014a .LASF67
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2162   .debug_str:0000000000000207 .LASF68
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2146   .debug_str:00000000000001bf .LASF69
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2250   .debug_str:0000000000000415 .LASF70
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2074   .debug_str:000000000000001a .LASF71
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2258   .debug_str:0000000000000431 .LASF72
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2254   .debug_str:000000000000041f .LASF73
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2214   .debug_str:0000000000000365 .LASF74
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2256   .debug_str:0000000000000427 .LASF75
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2180   .debug_str:000000000000026b .LASF76
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2154   .debug_str:00000000000001e4 .LASF77
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2330   .debug_str:0000000000000592 .LASF78
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2218   .debug_str:0000000000000377 .LASF79
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2164   .debug_str:000000000000020f .LASF80
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2128   .debug_str:0000000000000167 .LASF81
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2224   .debug_str:00000000000003a1 .LASF82
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2174   .debug_str:0000000000000249 .LASF83
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2312   .debug_str:000000000000053f .LASF84
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2114   .debug_str:000000000000012a .LASF85
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2108   .debug_str:000000000000010f .LASF86
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2278   .debug_str:0000000000000490 .LASF87
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2236   .debug_str:00000000000003d0 .LASF88
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2306   .debug_str:0000000000000526 .LASF89
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2170   .debug_str:000000000000022f .LASF90
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2234   .debug_str:00000000000003ca .LASF91
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2072   .debug_str:0000000000000012 .LASF92
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2264   .debug_str:0000000000000459 .LASF93
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2284   .debug_str:00000000000004a5 .LASF94
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2292   .debug_str:00000000000004dd .LASF95
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2300   .debug_str:000000000000050a .LASF96
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s 			page 5
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2134   .debug_str:0000000000000188 .LASF97
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2178   .debug_str:000000000000025e .LASF98
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2320   .debug_str:0000000000000562 .LASF99
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2150   .debug_str:00000000000001cf .LASF100
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2246   .debug_str:00000000000003fd .LASF101
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2324   .debug_str:0000000000000578 .LASF102
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2248   .debug_str:0000000000000408 .LASF103
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2328   .debug_str:0000000000000584 .LASF104
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2094   .debug_str:00000000000000c8 .LASF105
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2310   .debug_str:0000000000000535 .LASF106
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2176   .debug_str:0000000000000252 .LASF107
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2296   .debug_str:00000000000004ea .LASF108
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2136   .debug_str:0000000000000195 .LASF109
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2092   .debug_str:00000000000000b9 .LASF110
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2132   .debug_str:0000000000000177 .LASF111
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2078   .debug_str:000000000000002b .LASF112
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2080   .debug_str:000000000000003a .LASF113
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2226   .debug_str:00000000000003a6 .LASF114
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2206   .debug_str:00000000000002d3 .LASF115
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2198   .debug_str:00000000000002b0 .LASF116
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2316   .debug_str:000000000000054f .LASF117
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2086   .debug_str:000000000000006b .LASF131
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2272   .debug_str:0000000000000475 .LASF118
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2298   .debug_str:00000000000004f7 .LASF119
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2126   .debug_str:000000000000015a .LASF120
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2242   .debug_str:00000000000003ea .LASF121
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2184   .debug_str:0000000000000279 .LASF122
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2200   .debug_str:00000000000002b9 .LASF123
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2204   .debug_str:00000000000002cc .LASF124
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2282   .debug_str:000000000000049e .LASF125
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2326   .debug_str:000000000000057d .LASF126
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2192   .debug_str:0000000000000296 .LASF127
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:14     .text._close:0000000000000000 .LFB1
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:27     .text._close:0000000000000004 .LFE1
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2033   .debug_loc:0000000000000000 .LLST0
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:2090   .debug_str:00000000000000b3 .LASF132
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:18     .text._close:0000000000000000 .LVL0
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:24     .text._close:0000000000000002 .LVL1
+C:\Users\Jesper\AppData\Local\Temp\ccTIQMcr.s:38     .debug_info:0000000000000000 .Ldebug_info0
+
+NO UNDEFINED SYMBOLS

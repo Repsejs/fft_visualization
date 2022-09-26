@@ -1,0 +1,1685 @@
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 1
+
+
+   1              		.file	"fft.c"
+   2              		.option nopic
+   3              		.attribute arch, "rv32i2p0_m2p0_a2p0_c2p0"
+   4              		.attribute unaligned_access, 0
+   5              		.attribute stack_align, 16
+   6              		.text
+   7              	.Ltext0:
+   8              		.cfi_sections	.debug_frame
+   9              		.section	.text.fft,"ax",@progbits
+  10              		.align	1
+  11              		.globl	fft
+  13              	fft:
+  14              	.LFB0:
+  15              		.file 1 "fft.c"
+   1:fft.c         **** #include "fft.h"
+   2:fft.c         **** 
+   3:fft.c         **** #define FLOAT_TO_INT(x) ((x) >= 0 ? (int)((x) + 0.5) : (int)((x)-0.5))
+   4:fft.c         **** 
+   5:fft.c         **** static const int sin_tb[] = {
+   6:fft.c         ****     FLOAT_TO_INT(0.000000 * (1 << FFT_MATH_FRACTION_BITS)), //PI
+   7:fft.c         ****     FLOAT_TO_INT(1.000000 * (1 << FFT_MATH_FRACTION_BITS)), //PI/2
+   8:fft.c         ****     FLOAT_TO_INT(0.707107 * (1 << FFT_MATH_FRACTION_BITS)), //PI/4
+   9:fft.c         ****     FLOAT_TO_INT(0.382683 * (1 << FFT_MATH_FRACTION_BITS)), //PI/8
+  10:fft.c         ****     FLOAT_TO_INT(0.195090 * (1 << FFT_MATH_FRACTION_BITS)), //PI/16
+  11:fft.c         ****     FLOAT_TO_INT(0.098017 * (1 << FFT_MATH_FRACTION_BITS)), //...
+  12:fft.c         ****     FLOAT_TO_INT(0.049068 * (1 << FFT_MATH_FRACTION_BITS)),
+  13:fft.c         ****     FLOAT_TO_INT(0.024541 * (1 << FFT_MATH_FRACTION_BITS)),
+  14:fft.c         ****     FLOAT_TO_INT(0.012272 * (1 << FFT_MATH_FRACTION_BITS)),
+  15:fft.c         ****     FLOAT_TO_INT(0.006136 * (1 << FFT_MATH_FRACTION_BITS)),
+  16:fft.c         ****     FLOAT_TO_INT(0.003068 * (1 << FFT_MATH_FRACTION_BITS)),
+  17:fft.c         ****     FLOAT_TO_INT(0.001534 * (1 << FFT_MATH_FRACTION_BITS)),
+  18:fft.c         ****     FLOAT_TO_INT(0.000767 * (1 << FFT_MATH_FRACTION_BITS)),
+  19:fft.c         ****     FLOAT_TO_INT(0.000383 * (1 << FFT_MATH_FRACTION_BITS)),
+  20:fft.c         ****     FLOAT_TO_INT(0.000192 * (1 << FFT_MATH_FRACTION_BITS)),
+  21:fft.c         ****     FLOAT_TO_INT(0.000096 * (1 << FFT_MATH_FRACTION_BITS)),
+  22:fft.c         ****     FLOAT_TO_INT(0.000048 * (1 << FFT_MATH_FRACTION_BITS)),
+  23:fft.c         ****     FLOAT_TO_INT(0.000024 * (1 << FFT_MATH_FRACTION_BITS)),
+  24:fft.c         ****     FLOAT_TO_INT(0.000012 * (1 << FFT_MATH_FRACTION_BITS)),
+  25:fft.c         ****     FLOAT_TO_INT(0.000006 * (1 << FFT_MATH_FRACTION_BITS)),  //...
+  26:fft.c         ****     FLOAT_TO_INT(0.000003 * (1 << FFT_MATH_FRACTION_BITS))}; //PI/(2^K)
+  27:fft.c         **** 
+  28:fft.c         **** static const int cos_tb[] = {
+  29:fft.c         ****     FLOAT_TO_INT(-1.000000 * (1 << FFT_MATH_FRACTION_BITS)), //PI
+  30:fft.c         ****     FLOAT_TO_INT( 0.000000 * (1 << FFT_MATH_FRACTION_BITS)), //PI/2
+  31:fft.c         ****     FLOAT_TO_INT( 0.707107 * (1 << FFT_MATH_FRACTION_BITS)), //PI/4
+  32:fft.c         ****     FLOAT_TO_INT( 0.923880 * (1 << FFT_MATH_FRACTION_BITS)), //PI/8
+  33:fft.c         ****     FLOAT_TO_INT( 0.980785 * (1 << FFT_MATH_FRACTION_BITS)), //PI/16
+  34:fft.c         ****     FLOAT_TO_INT( 0.995185 * (1 << FFT_MATH_FRACTION_BITS)), //...
+  35:fft.c         ****     FLOAT_TO_INT( 0.998795 * (1 << FFT_MATH_FRACTION_BITS)),
+  36:fft.c         ****     FLOAT_TO_INT( 0.999699 * (1 << FFT_MATH_FRACTION_BITS)),
+  37:fft.c         ****     FLOAT_TO_INT( 0.999925 * (1 << FFT_MATH_FRACTION_BITS)),
+  38:fft.c         ****     FLOAT_TO_INT( 0.999981 * (1 << FFT_MATH_FRACTION_BITS)),
+  39:fft.c         ****     FLOAT_TO_INT( 0.999995 * (1 << FFT_MATH_FRACTION_BITS)),
+  40:fft.c         ****     FLOAT_TO_INT( 0.999999 * (1 << FFT_MATH_FRACTION_BITS)),
+  41:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),
+  42:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),
+  43:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 2
+
+
+  44:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),
+  45:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),
+  46:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),
+  47:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),
+  48:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS)),  //...
+  49:fft.c         ****     FLOAT_TO_INT( 1.000000 * (1 << FFT_MATH_FRACTION_BITS))}; //PI/(2^K)
+  50:fft.c         **** 
+  51:fft.c         **** /**
+  52:fft.c         ****  * @brief Simple Fast Fourier Transform also known as FFT.
+  53:fft.c         ****  *
+  54:fft.c         ****  * @param x is a fixedpoint array of the complex datatype defined in fft.h,
+  55:fft.c         ****  * the answer of the FFT will be in this array. The data in this
+  56:fft.c         ****  * array will be deleted, make sure to save the data if you need it.
+  57:fft.c         ****  *
+  58:fft.c         ****  * @param N is the length of the array. NOTE this variable need to
+  59:fft.c         ****  * be a number 2^k.
+  60:fft.c         ****  *
+  61:fft.c         ****  * @return The function returns 0, the answer is in the array.
+  62:fft.c         ****  */
+  63:fft.c         **** int32_t fft(Complex x[], int32_t N) {
+  16              		.loc 1 63 37
+  17              		.cfi_startproc
+  18              	.LVL0:
+  64:fft.c         ****     int i, j, l, k, ip;
+  19              		.loc 1 64 5
+  65:fft.c         ****     static int32_t M = 0;
+  20              		.loc 1 65 5
+  66:fft.c         ****     static int le, le2;
+  21              		.loc 1 66 5
+  67:fft.c         ****     static int sR, sI;
+  22              		.loc 1 67 5
+  68:fft.c         ****     static int uR, uI, tR, tI;
+  23              		.loc 1 68 5
+  69:fft.c         **** 
+  70:fft.c         ****     M = floor_log2_32(N);
+  24              		.loc 1 70 5
+  25              	.LBB12:
+  26              	.LBB13:
+  71:fft.c         ****     /*
+  72:fft.c         ****      * bit reversal sorting
+  73:fft.c         ****      */
+  74:fft.c         ****     l = N >> 1;
+  75:fft.c         ****     j = l;
+  76:fft.c         ****     ip = N - 2;
+  77:fft.c         ****     for (i = 1; i <= ip; i++) {
+  78:fft.c         ****         if (i < j) {
+  79:fft.c         ****             tR = x[j].real;
+  80:fft.c         ****             tI = x[j].imag;
+  81:fft.c         ****             x[j].real = x[i].real;
+  82:fft.c         ****             x[j].imag = x[i].imag;
+  83:fft.c         ****             x[i].real = tR;
+  84:fft.c         ****             x[i].imag = tI;
+  85:fft.c         ****         }
+  86:fft.c         ****         k = l;
+  87:fft.c         ****         while (k <= j) {
+  88:fft.c         ****             j = j - k;
+  89:fft.c         ****             k = k >> 1;
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 3
+
+
+  90:fft.c         ****         }
+  91:fft.c         ****         j = j + k;
+  92:fft.c         ****     }
+  93:fft.c         **** 
+  94:fft.c         ****     /*
+  95:fft.c         ****      * For Loops
+  96:fft.c         ****      */
+  97:fft.c         ****     for (l = 1; l <= M; l++) {
+  98:fft.c         ****         le = (int)(1 << l);
+  99:fft.c         ****         le2 = (int)(le >> 1);
+ 100:fft.c         ****         uR = 1 << FFT_MATH_FRACTION_BITS;
+ 101:fft.c         ****         uI = 0 << FFT_MATH_FRACTION_BITS;
+ 102:fft.c         **** 
+ 103:fft.c         ****         k = floor_log2_32(le2);
+ 104:fft.c         ****         sR = cos_tb[k];
+ 105:fft.c         ****         sI = -sin_tb[k];
+ 106:fft.c         ****         for (j = 1; j <= le2; j++) {          /* loop for each sub DFT */
+ 107:fft.c         ****             for (i = j - 1; i < N; i += le) { /* loop for each butterfly */
+ 108:fft.c         ****                 ip = i + le2;
+ 109:fft.c         ****                 tR = (((long)uR * x[ip].real) >> FFT_MATH_FRACTION_BITS) -
+ 110:fft.c         ****                      (((long)uI * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 111:fft.c         ****                 tI = (((long)uI * x[ip].real) >> FFT_MATH_FRACTION_BITS) +
+ 112:fft.c         ****                      (((long)uR * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 113:fft.c         ****                 x[ip].real = x[i].real - tR;
+ 114:fft.c         ****                 x[ip].imag = x[i].imag - tI;
+ 115:fft.c         ****                 x[i].real += tR;
+ 116:fft.c         ****                 x[i].imag += tI;
+ 117:fft.c         ****             } /* Next i */
+ 118:fft.c         ****             /* Calculation of twiddle factor */
+ 119:fft.c         ****             tR = uR;
+ 120:fft.c         ****             uR = (((long)tR * sR) >> FFT_MATH_FRACTION_BITS) -
+ 121:fft.c         ****                  (((long)uI * sI) >> FFT_MATH_FRACTION_BITS);
+ 122:fft.c         ****             uI = (((long)tR * sI) >> FFT_MATH_FRACTION_BITS) +
+ 123:fft.c         ****                  (((long)uI * sR) >> FFT_MATH_FRACTION_BITS);
+ 124:fft.c         ****         } /* Next j */
+ 125:fft.c         ****     }     /* Next l */
+ 126:fft.c         **** 
+ 127:fft.c         ****     return 0;
+ 128:fft.c         **** }
+ 129:fft.c         **** 
+ 130:fft.c         **** /**
+ 131:fft.c         ****  * @brief Simple inverse Fast Fourier Transform also known as IFFT. 
+ 132:fft.c         ****  * 
+ 133:fft.c         ****  * @param x is a fixedpoint array of the complex datatype defined in fft.h,
+ 134:fft.c         ****  * the answer of the IFFT will be in this array. The data in this
+ 135:fft.c         ****  * array will be deleted, make sure to save the data if you need it.
+ 136:fft.c         ****  * 
+ 137:fft.c         ****  * @param N is the length of the array. NOTE this variable need to
+ 138:fft.c         ****  * be a number 2^k.
+ 139:fft.c         ****  * 
+ 140:fft.c         ****  * @return The function returns 0, the answer is in the array. 
+ 141:fft.c         ****  */
+ 142:fft.c         **** int32_t inverse_fft(Complex x[], int32_t N) {
+ 143:fft.c         ****     int k = 0;
+ 144:fft.c         **** 
+ 145:fft.c         ****     for (k = 0; k <= N - 1; k++) {
+ 146:fft.c         ****         x[k].imag = -x[k].imag;
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 4
+
+
+ 147:fft.c         ****     }
+ 148:fft.c         **** 
+ 149:fft.c         ****     fft(x, N); /* using FFT */
+ 150:fft.c         **** 
+ 151:fft.c         ****     for (k = 0; k <= N - 1; k++) {
+ 152:fft.c         ****         x[k].real = x[k].real / N;
+ 153:fft.c         ****         x[k].imag = -x[k].imag / N;
+ 154:fft.c         ****     }
+ 155:fft.c         **** 
+ 156:fft.c         ****     return 0;
+ 157:fft.c         **** }
+ 158:fft.c         **** 
+ 159:fft.c         **** /**
+ 160:fft.c         ****  * @brief Returns the number of ones, bitwise in an function.
+ 161:fft.c         ****  *
+ 162:fft.c         ****  * @param n the number.
+ 163:fft.c         ****  * @return int number of ones.
+ 164:fft.c         ****  */
+ 165:fft.c         **** static int32_t ones_32(int32_t n) {
+ 166:fft.c         ****     unsigned int c = 0;
+ 167:fft.c         ****     for (c = 0; n; ++c) {
+ 168:fft.c         ****         n &= (n - 1);
+ 169:fft.c         ****     }
+ 170:fft.c         ****     return c;
+ 171:fft.c         **** }
+ 172:fft.c         **** 
+ 173:fft.c         **** /**
+ 174:fft.c         ****  * @brief Returns the floor(log2(x))
+ 175:fft.c         ****  *
+ 176:fft.c         ****  * @param x the number
+ 177:fft.c         ****  * @return floor log2 of x
+ 178:fft.c         ****  */
+ 179:fft.c         **** static int32_t floor_log2_32(int32_t x) {
+ 180:fft.c         ****     x |= (x >> 1);
+  27              		.loc 1 180 5
+  28              		.loc 1 180 13 is_stmt 0
+  29 0000 13D81540 		srai	a6,a1,1
+  30              		.loc 1 180 7
+  31 0004 B3E70501 		or	a5,a1,a6
+  32              	.LVL1:
+ 181:fft.c         ****     x |= (x >> 2);
+  33              		.loc 1 181 5 is_stmt 1
+  34              		.loc 1 181 13 is_stmt 0
+  35 0008 13D72740 		srai	a4,a5,2
+  36              		.loc 1 181 7
+  37 000c D98F     		or	a5,a5,a4
+  38              	.LVL2:
+ 182:fft.c         ****     x |= (x >> 4);
+  39              		.loc 1 182 5 is_stmt 1
+  40              		.loc 1 182 13 is_stmt 0
+  41 000e 13D74740 		srai	a4,a5,4
+  42              		.loc 1 182 7
+  43 0012 D98F     		or	a5,a5,a4
+  44              	.LVL3:
+ 183:fft.c         ****     x |= (x >> 8);
+  45              		.loc 1 183 5 is_stmt 1
+  46              		.loc 1 183 13 is_stmt 0
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 5
+
+
+  47 0014 13D78740 		srai	a4,a5,8
+  48              	.LBE13:
+  49              	.LBE12:
+  63:fft.c         ****     int i, j, l, k, ip;
+  50              		.loc 1 63 37
+  51 0018 7971     		addi	sp,sp,-48
+  52              	.LCFI0:
+  53              		.cfi_def_cfa_offset 48
+  54              	.LBB26:
+  55              	.LBB20:
+  56              		.loc 1 183 7
+  57 001a D98F     		or	a5,a5,a4
+  58              	.LVL4:
+ 184:fft.c         ****     x |= (x >> 16);
+  59              		.loc 1 184 5 is_stmt 1
+  60              	.LBE20:
+  61              	.LBE26:
+  63:fft.c         ****     int i, j, l, k, ip;
+  62              		.loc 1 63 37 is_stmt 0
+  63 001c 4ED0     		sw	s3,32(sp)
+  64              		.cfi_offset 19, -16
+  65              	.LBB27:
+  66              	.LBB21:
+  67              		.loc 1 184 13
+  68 001e 93D90741 		srai	s3,a5,16
+  69              	.LVL5:
+ 185:fft.c         **** 
+ 186:fft.c         ****     return (ones_32(x >> 1));
+  70              		.loc 1 186 5 is_stmt 1
+ 184:fft.c         ****     x |= (x >> 16);
+  71              		.loc 1 184 7 is_stmt 0
+  72 0022 B3E93701 		or	s3,a5,s3
+  73              	.LVL6:
+  74              	.LBE21:
+  75              	.LBE27:
+  63:fft.c         ****     int i, j, l, k, ip;
+  76              		.loc 1 63 37
+  77 0026 56CC     		sw	s5,24(sp)
+  78 0028 22D6     		sw	s0,44(sp)
+  79 002a 26D4     		sw	s1,40(sp)
+  80 002c 4AD2     		sw	s2,36(sp)
+  81 002e 52CE     		sw	s4,28(sp)
+  82 0030 5ACA     		sw	s6,20(sp)
+  83 0032 5EC8     		sw	s7,16(sp)
+  84 0034 62C6     		sw	s8,12(sp)
+  85 0036 66C4     		sw	s9,8(sp)
+  86 0038 6AC2     		sw	s10,4(sp)
+  87 003a 6EC0     		sw	s11,0(sp)
+  88              		.cfi_offset 21, -24
+  89              		.cfi_offset 8, -4
+  90              		.cfi_offset 9, -8
+  91              		.cfi_offset 18, -12
+  92              		.cfi_offset 20, -20
+  93              		.cfi_offset 22, -28
+  94              		.cfi_offset 23, -32
+  95              		.cfi_offset 24, -36
+  96              		.cfi_offset 25, -40
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 6
+
+
+  97              		.cfi_offset 26, -44
+  98              		.cfi_offset 27, -48
+  99              	.LBB28:
+ 100              	.LBB22:
+ 101              		.loc 1 186 13
+ 102 003c 93D91940 		srai	s3,s3,1
+ 103              	.LVL7:
+ 104              	.LBB14:
+ 105              	.LBB15:
+ 166:fft.c         ****     for (c = 0; n; ++c) {
+ 106              		.loc 1 166 5 is_stmt 1
+ 167:fft.c         ****         n &= (n - 1);
+ 107              		.loc 1 167 5
+ 108              	.LBE15:
+ 109              	.LBE14:
+ 110              	.LBE22:
+ 111              	.LBE28:
+  63:fft.c         ****     int i, j, l, k, ip;
+ 112              		.loc 1 63 37 is_stmt 0
+ 113 0040 AA8A     		mv	s5,a0
+ 114 0042 1385E5FF 		addi	a0,a1,-2
+ 115              	.LVL8:
+ 116              	.LBB29:
+ 117              	.LBB23:
+ 118              	.LBB18:
+ 119              	.LBB16:
+ 167:fft.c         ****         n &= (n - 1);
+ 120              		.loc 1 167 5
+ 121 0046 6380091E 		beq	s3,zero,.L2
+ 167:fft.c         ****         n &= (n - 1);
+ 122              		.loc 1 167 12
+ 123 004a 8147     		li	a5,0
+ 124              	.LVL9:
+ 125              	.L3:
+ 168:fft.c         ****     }
+ 126              		.loc 1 168 9 is_stmt 1
+ 168:fft.c         ****     }
+ 127              		.loc 1 168 17 is_stmt 0
+ 128 004c 1387F9FF 		addi	a4,s3,-1
+ 168:fft.c         ****     }
+ 129              		.loc 1 168 11
+ 130 0050 B3F9E900 		and	s3,s3,a4
+ 131              	.LVL10:
+ 167:fft.c         ****         n &= (n - 1);
+ 132              		.loc 1 167 20
+ 133 0054 8507     		addi	a5,a5,1
+ 134              	.LVL11:
+ 167:fft.c         ****         n &= (n - 1);
+ 135              		.loc 1 167 5
+ 136 0056 E39B09FE 		bne	s3,zero,.L3
+ 170:fft.c         **** }
+ 137              		.loc 1 170 5 is_stmt 1
+ 170:fft.c         **** }
+ 138              		.loc 1 170 12 is_stmt 0
+ 139 005a BE89     		mv	s3,a5
+ 140              	.LVL12:
+ 141              	.LBE16:
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 7
+
+
+ 142              	.LBE18:
+ 143              	.LBE23:
+ 144              	.LBE29:
+  74:fft.c         ****     j = l;
+ 145              		.loc 1 74 5 is_stmt 1
+  75:fft.c         ****     ip = N - 2;
+ 146              		.loc 1 75 5
+  76:fft.c         ****     for (i = 1; i <= ip; i++) {
+ 147              		.loc 1 76 5
+  77:fft.c         ****         if (i < j) {
+ 148              		.loc 1 77 5
+ 149 005c 6357A004 		ble	a0,zero,.L4
+ 150              	.LVL13:
+ 151              	.L20:
+ 152 0060 13868A00 		addi	a2,s5,8
+ 153              	.LBB30:
+ 154              	.LBB24:
+ 180:fft.c         ****     x |= (x >> 2);
+ 155              		.loc 1 180 13 is_stmt 0
+ 156 0064 4287     		mv	a4,a6
+ 157 0066 8546     		li	a3,1
+ 158              	.LVL14:
+ 159              	.L8:
+ 160              	.LBE24:
+ 161              	.LBE30:
+  78:fft.c         ****             tR = x[j].real;
+ 162              		.loc 1 78 9 is_stmt 1
+  78:fft.c         ****             tR = x[j].real;
+ 163              		.loc 1 78 12 is_stmt 0
+ 164 0068 63D5E602 		bge	a3,a4,.L5
+  79:fft.c         ****             tI = x[j].imag;
+ 165              		.loc 1 79 13 is_stmt 1
+  81:fft.c         ****             x[j].imag = x[i].imag;
+ 166              		.loc 1 81 29 is_stmt 0
+ 167 006c 83280600 		lw	a7,0(a2)
+  79:fft.c         ****             tI = x[j].imag;
+ 168              		.loc 1 79 19
+ 169 0070 93173700 		slli	a5,a4,3
+ 170 0074 D697     		add	a5,s5,a5
+  79:fft.c         ****             tI = x[j].imag;
+ 171              		.loc 1 79 22
+ 172 0076 03A30700 		lw	t1,0(a5)
+  80:fft.c         ****             x[j].real = x[i].real;
+ 173              		.loc 1 80 13 is_stmt 1
+  81:fft.c         ****             x[j].imag = x[i].imag;
+ 174              		.loc 1 81 23 is_stmt 0
+ 175 007a 23A01701 		sw	a7,0(a5)
+  82:fft.c         ****             x[i].real = tR;
+ 176              		.loc 1 82 29
+ 177 007e 032E4600 		lw	t3,4(a2)
+  80:fft.c         ****             x[j].real = x[i].real;
+ 178              		.loc 1 80 22
+ 179 0082 83A84700 		lw	a7,4(a5)
+  81:fft.c         ****             x[j].imag = x[i].imag;
+ 180              		.loc 1 81 13 is_stmt 1
+  82:fft.c         ****             x[i].real = tR;
+ 181              		.loc 1 82 13
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 8
+
+
+  82:fft.c         ****             x[i].real = tR;
+ 182              		.loc 1 82 23 is_stmt 0
+ 183 0086 23A2C701 		sw	t3,4(a5)
+  83:fft.c         ****             x[i].imag = tI;
+ 184              		.loc 1 83 13 is_stmt 1
+  83:fft.c         ****             x[i].imag = tI;
+ 185              		.loc 1 83 23 is_stmt 0
+ 186 008a 23206600 		sw	t1,0(a2)
+  84:fft.c         ****         }
+ 187              		.loc 1 84 13 is_stmt 1
+  84:fft.c         ****         }
+ 188              		.loc 1 84 23 is_stmt 0
+ 189 008e 23221601 		sw	a7,4(a2)
+ 190              	.L5:
+  86:fft.c         ****         while (k <= j) {
+ 191              		.loc 1 86 9 is_stmt 1
+ 192              	.LVL15:
+  87:fft.c         ****             j = j - k;
+ 193              		.loc 1 87 9
+  87:fft.c         ****             j = j - k;
+ 194              		.loc 1 87 15 is_stmt 0
+ 195 0092 C287     		mv	a5,a6
+ 196 0094 63460701 		bgt	a6,a4,.L6
+ 197              	.LVL16:
+ 198              	.L7:
+  88:fft.c         ****             k = k >> 1;
+ 199              		.loc 1 88 13 is_stmt 1
+  88:fft.c         ****             k = k >> 1;
+ 200              		.loc 1 88 15 is_stmt 0
+ 201 0098 1D8F     		sub	a4,a4,a5
+ 202              	.LVL17:
+  89:fft.c         ****         }
+ 203              		.loc 1 89 13 is_stmt 1
+  89:fft.c         ****         }
+ 204              		.loc 1 89 15 is_stmt 0
+ 205 009a 8587     		srai	a5,a5,1
+ 206              	.LVL18:
+  87:fft.c         ****             j = j - k;
+ 207              		.loc 1 87 15
+ 208 009c E35EF7FE 		bge	a4,a5,.L7
+ 209              	.L6:
+  91:fft.c         ****     }
+ 210              		.loc 1 91 9 is_stmt 1 discriminator 2
+  77:fft.c         ****         if (i < j) {
+ 211              		.loc 1 77 27 is_stmt 0 discriminator 2
+ 212 00a0 8506     		addi	a3,a3,1
+ 213              	.LVL19:
+  91:fft.c         ****     }
+ 214              		.loc 1 91 11 discriminator 2
+ 215 00a2 3E97     		add	a4,a4,a5
+ 216              	.LVL20:
+ 217 00a4 2106     		addi	a2,a2,8
+  77:fft.c         ****         if (i < j) {
+ 218              		.loc 1 77 5 discriminator 2
+ 219 00a6 E351D5FC 		ble	a3,a0,.L8
+ 220              	.LVL21:
+ 221              	.L4:
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 9
+
+
+  97:fft.c         ****         le = (int)(1 << l);
+ 222              		.loc 1 97 5
+ 223 00aa 635F3015 		ble	s3,zero,.L26
+  98:fft.c         ****         le2 = (int)(le >> 1);
+ 224              		.loc 1 98 9 is_stmt 1
+  99:fft.c         ****         uR = 1 << FFT_MATH_FRACTION_BITS;
+ 225              		.loc 1 99 9
+ 100:fft.c         ****         uI = 0 << FFT_MATH_FRACTION_BITS;
+ 226              		.loc 1 100 9
+ 100:fft.c         ****         uI = 0 << FFT_MATH_FRACTION_BITS;
+ 227              		.loc 1 100 12 is_stmt 0
+ 228 00ae 370D0000 		lui	s10,%hi(.LANCHOR2)
+ 101:fft.c         **** 
+ 229              		.loc 1 101 12
+ 230 00b2 B70C0000 		lui	s9,%hi(.LANCHOR3)
+ 100:fft.c         ****         uI = 0 << FFT_MATH_FRACTION_BITS;
+ 231              		.loc 1 100 12
+ 232 00b6 130D0D00 		addi	s10,s10,%lo(.LANCHOR2)
+ 101:fft.c         **** 
+ 233              		.loc 1 101 12
+ 234 00ba 938C0C00 		addi	s9,s9,%lo(.LANCHOR3)
+ 100:fft.c         ****         uI = 0 << FFT_MATH_FRACTION_BITS;
+ 235              		.loc 1 100 12
+ 236 00be 93070010 		li	a5,256
+ 101:fft.c         **** 
+ 237              		.loc 1 101 12
+ 238 00c2 0145     		li	a0,0
+ 239 00c4 B70B0000 		lui	s7,%hi(.LANCHOR0)
+ 240 00c8 370B0000 		lui	s6,%hi(.LANCHOR1)
+ 100:fft.c         ****         uI = 0 << FFT_MATH_FRACTION_BITS;
+ 241              		.loc 1 100 12
+ 242 00cc 2320FD00 		sw	a5,0(s10)
+ 101:fft.c         **** 
+ 243              		.loc 1 101 9 is_stmt 1
+ 101:fft.c         **** 
+ 244              		.loc 1 101 12 is_stmt 0
+ 245 00d0 23A00C00 		sw	zero,0(s9)
+ 103:fft.c         ****         sR = cos_tb[k];
+ 246              		.loc 1 103 9 is_stmt 1
+ 247              	.LVL22:
+ 248              	.LBB31:
+ 249              	.LBB32:
+ 180:fft.c         ****     x |= (x >> 2);
+ 250              		.loc 1 180 5
+ 181:fft.c         ****     x |= (x >> 4);
+ 251              		.loc 1 181 5
+ 182:fft.c         ****     x |= (x >> 8);
+ 252              		.loc 1 182 5
+ 183:fft.c         ****     x |= (x >> 16);
+ 253              		.loc 1 183 5
+ 184:fft.c         **** 
+ 254              		.loc 1 184 5
+ 255              		.loc 1 186 5
+ 256              	.LBB33:
+ 257              	.LBB34:
+ 166:fft.c         ****     for (c = 0; n; ++c) {
+ 258              		.loc 1 166 5
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 10
+
+
+ 167:fft.c         ****         n &= (n - 1);
+ 259              		.loc 1 167 5
+ 260              	.LBE34:
+ 261              	.LBE33:
+ 262              	.LBE32:
+ 263              	.LBE31:
+  99:fft.c         ****         uR = 1 << FFT_MATH_FRACTION_BITS;
+ 264              		.loc 1 99 15 is_stmt 0
+ 265 00d4 0549     		li	s2,1
+ 266 00d6 8509     		addi	s3,s3,1
+ 101:fft.c         **** 
+ 267              		.loc 1 101 12
+ 268 00d8 130400F0 		li	s0,-256
+ 269 00dc 0147     		li	a4,0
+  97:fft.c         ****         le = (int)(1 << l);
+ 270              		.loc 1 97 12
+ 271 00de 054A     		li	s4,1
+  98:fft.c         ****         le2 = (int)(le >> 1);
+ 272              		.loc 1 98 14
+ 273 00e0 894F     		li	t6,2
+ 274 00e2 054C     		li	s8,1
+ 275 00e4 938B0B00 		addi	s7,s7,%lo(.LANCHOR0)
+ 276 00e8 130B0B00 		addi	s6,s6,%lo(.LANCHOR1)
+ 277              	.LBB41:
+ 278              	.LBB39:
+ 279              	.LBB37:
+ 280              	.LBB35:
+ 170:fft.c         **** }
+ 281              		.loc 1 170 5 is_stmt 1
+ 282              	.LVL23:
+ 283              	.LBE35:
+ 284              	.LBE37:
+ 285              	.LBE39:
+ 286              	.LBE41:
+ 104:fft.c         ****         sI = -sin_tb[k];
+ 287              		.loc 1 104 9
+ 105:fft.c         ****         for (j = 1; j <= le2; j++) {          /* loop for each sub DFT */
+ 288              		.loc 1 105 9
+ 105:fft.c         ****         for (j = 1; j <= le2; j++) {          /* loop for each sub DFT */
+ 289              		.loc 1 105 14 is_stmt 0
+ 290 00ec 3305A040 		neg	a0,a0
+ 106:fft.c         ****             for (i = j - 1; i < N; i += le) { /* loop for each butterfly */
+ 291              		.loc 1 106 9 is_stmt 1
+ 292              	.LVL24:
+ 293 00f0 63512011 		ble	s2,zero,.L24
+ 294              	.LVL25:
+ 295              	.L39:
+ 296 00f4 93143900 		slli	s1,s2,3
+ 297 00f8 93838A00 		addi	t2,s5,8
+ 298 00fc 139F3F00 		slli	t5,t6,3
+ 299 0100 8142     		li	t0,0
+ 300 0102 014E     		li	t3,0
+ 301 0104 930E0010 		li	t4,256
+ 302 0108 E114     		addi	s1,s1,-8
+ 303              	.LVL26:
+ 304              	.L15:
+ 107:fft.c         ****                 ip = i + le2;
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 11
+
+
+ 305              		.loc 1 107 13
+ 107:fft.c         ****                 ip = i + le2;
+ 306              		.loc 1 107 20 is_stmt 0
+ 307 010a 1683     		mv	t1,t0
+ 308              	.LVL27:
+ 309 010c 33887400 		add	a6,s1,t2
+ 107:fft.c         ****                 ip = i + le2;
+ 310              		.loc 1 107 13
+ 311 0110 1E87     		mv	a4,t2
+ 312 0112 63D1B206 		ble	a1,t0,.L17
+ 313              	.LVL28:
+ 314              	.L16:
+ 108:fft.c         ****                 tR = (((long)uR * x[ip].real) >> FFT_MATH_FRACTION_BITS) -
+ 315              		.loc 1 108 17 is_stmt 1 discriminator 3
+ 109:fft.c         ****                      (((long)uI * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 316              		.loc 1 109 17 discriminator 3
+ 109:fft.c         ****                      (((long)uI * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 317              		.loc 1 109 40 is_stmt 0 discriminator 3
+ 318 0116 83270800 		lw	a5,0(a6)
+ 110:fft.c         ****                 tI = (((long)uI * x[ip].real) >> FFT_MATH_FRACTION_BITS) +
+ 319              		.loc 1 110 40 discriminator 3
+ 320 011a 03264800 		lw	a2,4(a6)
+ 113:fft.c         ****                 x[ip].imag = x[i].imag - tI;
+ 321              		.loc 1 113 40 discriminator 3
+ 322 011e 832887FF 		lw	a7,-8(a4)
+ 109:fft.c         ****                      (((long)uI * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 323              		.loc 1 109 33 discriminator 3
+ 324 0122 B38DD703 		mul	s11,a5,t4
+ 107:fft.c         ****                 ip = i + le2;
+ 325              		.loc 1 107 38 discriminator 3
+ 326 0126 7E93     		add	t1,t1,t6
+ 327              	.LVL29:
+ 110:fft.c         ****                 tI = (((long)uI * x[ip].real) >> FFT_MATH_FRACTION_BITS) +
+ 328              		.loc 1 110 33 discriminator 3
+ 329 0128 B306C603 		mul	a3,a2,t3
+ 109:fft.c         ****                      (((long)uI * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 330              		.loc 1 109 47 discriminator 3
+ 331 012c 93DD8D40 		srai	s11,s11,8
+ 111:fft.c         ****                      (((long)uR * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 332              		.loc 1 111 33 discriminator 3
+ 333 0130 B387C703 		mul	a5,a5,t3
+ 110:fft.c         ****                 tI = (((long)uI * x[ip].real) >> FFT_MATH_FRACTION_BITS) +
+ 334              		.loc 1 110 47 discriminator 3
+ 335 0134 A186     		srai	a3,a3,8
+ 109:fft.c         ****                      (((long)uI * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 336              		.loc 1 109 74 discriminator 3
+ 337 0136 B386DD40 		sub	a3,s11,a3
+ 111:fft.c         ****                      (((long)uR * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 338              		.loc 1 111 17 is_stmt 1 discriminator 3
+ 113:fft.c         ****                 x[ip].imag = x[i].imag - tI;
+ 339              		.loc 1 113 40 is_stmt 0 discriminator 3
+ 340 013a B388D840 		sub	a7,a7,a3
+ 113:fft.c         ****                 x[ip].imag = x[i].imag - tI;
+ 341              		.loc 1 113 28 discriminator 3
+ 342 013e 23201801 		sw	a7,0(a6)
+ 114:fft.c         ****                 x[i].real += tR;
+ 343              		.loc 1 114 40 discriminator 3
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 12
+
+
+ 344 0142 8328C7FF 		lw	a7,-4(a4)
+ 112:fft.c         ****                 x[ip].real = x[i].real - tR;
+ 345              		.loc 1 112 33 discriminator 3
+ 346 0146 3306D603 		mul	a2,a2,t4
+ 111:fft.c         ****                      (((long)uR * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 347              		.loc 1 111 47 discriminator 3
+ 348 014a A187     		srai	a5,a5,8
+ 112:fft.c         ****                 x[ip].real = x[i].real - tR;
+ 349              		.loc 1 112 47 discriminator 3
+ 350 014c 2186     		srai	a2,a2,8
+ 111:fft.c         ****                      (((long)uR * x[ip].imag) >> FFT_MATH_FRACTION_BITS);
+ 351              		.loc 1 111 74 discriminator 3
+ 352 014e B297     		add	a5,a5,a2
+ 113:fft.c         ****                 x[ip].imag = x[i].imag - tI;
+ 353              		.loc 1 113 17 is_stmt 1 discriminator 3
+ 114:fft.c         ****                 x[i].real += tR;
+ 354              		.loc 1 114 17 discriminator 3
+ 114:fft.c         ****                 x[i].real += tR;
+ 355              		.loc 1 114 40 is_stmt 0 discriminator 3
+ 356 0150 B388F840 		sub	a7,a7,a5
+ 114:fft.c         ****                 x[i].real += tR;
+ 357              		.loc 1 114 28 discriminator 3
+ 358 0154 23221801 		sw	a7,4(a6)
+ 115:fft.c         ****                 x[i].imag += tI;
+ 359              		.loc 1 115 17 is_stmt 1 discriminator 3
+ 115:fft.c         ****                 x[i].imag += tI;
+ 360              		.loc 1 115 27 is_stmt 0 discriminator 3
+ 361 0158 832887FF 		lw	a7,-8(a4)
+ 116:fft.c         ****             } /* Next i */
+ 362              		.loc 1 116 27 discriminator 3
+ 363 015c 0326C7FF 		lw	a2,-4(a4)
+ 364 0160 7A98     		add	a6,a6,t5
+ 115:fft.c         ****                 x[i].imag += tI;
+ 365              		.loc 1 115 27 discriminator 3
+ 366 0162 C696     		add	a3,a7,a3
+ 116:fft.c         ****             } /* Next i */
+ 367              		.loc 1 116 27 discriminator 3
+ 368 0164 B297     		add	a5,a2,a5
+ 115:fft.c         ****                 x[i].imag += tI;
+ 369              		.loc 1 115 27 discriminator 3
+ 370 0166 232CD7FE 		sw	a3,-8(a4)
+ 116:fft.c         ****             } /* Next i */
+ 371              		.loc 1 116 17 is_stmt 1 discriminator 3
+ 372              	.LVL30:
+ 116:fft.c         ****             } /* Next i */
+ 373              		.loc 1 116 27 is_stmt 0 discriminator 3
+ 374 016a 232EF7FE 		sw	a5,-4(a4)
+ 375 016e 7A97     		add	a4,a4,t5
+ 107:fft.c         ****                 ip = i + le2;
+ 376              		.loc 1 107 13 discriminator 3
+ 377 0170 E343B3FA 		bgt	a1,t1,.L16
+ 378              	.L17:
+ 119:fft.c         ****             uR = (((long)tR * sR) >> FFT_MATH_FRACTION_BITS) -
+ 379              		.loc 1 119 13 is_stmt 1
+ 120:fft.c         ****                  (((long)uI * sI) >> FFT_MATH_FRACTION_BITS);
+ 380              		.loc 1 120 13
+ 120:fft.c         ****                  (((long)uI * sI) >> FFT_MATH_FRACTION_BITS);
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 13
+
+
+ 381              		.loc 1 120 29 is_stmt 0
+ 382 0174 B3878E02 		mul	a5,t4,s0
+ 383 0178 8502     		addi	t0,t0,1
+ 384              	.LVL31:
+ 385 017a A103     		addi	t2,t2,8
+ 121:fft.c         ****             uI = (((long)tR * sI) >> FFT_MATH_FRACTION_BITS) +
+ 386              		.loc 1 121 29
+ 387 017c B306C503 		mul	a3,a0,t3
+ 120:fft.c         ****                  (((long)uI * sI) >> FFT_MATH_FRACTION_BITS);
+ 388              		.loc 1 120 35
+ 389 0180 A187     		srai	a5,a5,8
+ 122:fft.c         ****                  (((long)uI * sR) >> FFT_MATH_FRACTION_BITS);
+ 390              		.loc 1 122 29
+ 391 0182 3307D503 		mul	a4,a0,t4
+ 121:fft.c         ****             uI = (((long)tR * sI) >> FFT_MATH_FRACTION_BITS) +
+ 392              		.loc 1 121 35
+ 393 0186 A186     		srai	a3,a3,8
+ 120:fft.c         ****                  (((long)uI * sI) >> FFT_MATH_FRACTION_BITS);
+ 394              		.loc 1 120 62
+ 395 0188 958F     		sub	a5,a5,a3
+ 122:fft.c         ****                  (((long)uI * sR) >> FFT_MATH_FRACTION_BITS);
+ 396              		.loc 1 122 13 is_stmt 1
+ 120:fft.c         ****                  (((long)uI * sI) >> FFT_MATH_FRACTION_BITS);
+ 397              		.loc 1 120 62 is_stmt 0
+ 398 018a BE8E     		mv	t4,a5
+ 123:fft.c         ****         } /* Next j */
+ 399              		.loc 1 123 29
+ 400 018c 330E8E02 		mul	t3,t3,s0
+ 122:fft.c         ****                  (((long)uI * sR) >> FFT_MATH_FRACTION_BITS);
+ 401              		.loc 1 122 35
+ 402 0190 2187     		srai	a4,a4,8
+ 123:fft.c         ****         } /* Next j */
+ 403              		.loc 1 123 35
+ 404 0192 135E8E40 		srai	t3,t3,8
+ 122:fft.c         ****                  (((long)uI * sR) >> FFT_MATH_FRACTION_BITS);
+ 405              		.loc 1 122 62
+ 406 0196 3A9E     		add	t3,a4,t3
+ 407              	.LVL32:
+ 106:fft.c         ****             for (i = j - 1; i < N; i += le) { /* loop for each butterfly */
+ 408              		.loc 1 106 9
+ 409 0198 E31959F6 		bne	s2,t0,.L15
+  97:fft.c         ****         le = (int)(1 << l);
+ 410              		.loc 1 97 26
+ 411 019c 050A     		addi	s4,s4,1
+ 412              	.LVL33:
+ 413 019e 0547     		li	a4,1
+  97:fft.c         ****         le = (int)(1 << l);
+ 414              		.loc 1 97 5
+ 415 01a0 630F3A05 		beq	s4,s3,.L38
+ 416              	.LVL34:
+ 417              	.L18:
+  98:fft.c         ****         le2 = (int)(le >> 1);
+ 418              		.loc 1 98 9 is_stmt 1
+  98:fft.c         ****         le2 = (int)(le >> 1);
+ 419              		.loc 1 98 14 is_stmt 0
+ 420 01a4 B31F4C01 		sll	t6,s8,s4
+  99:fft.c         ****         uR = 1 << FFT_MATH_FRACTION_BITS;
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 14
+
+
+ 421              		.loc 1 99 9 is_stmt 1
+  99:fft.c         ****         uR = 1 << FFT_MATH_FRACTION_BITS;
+ 422              		.loc 1 99 15 is_stmt 0
+ 423 01a8 13D91F40 		srai	s2,t6,1
+ 100:fft.c         ****         uI = 0 << FFT_MATH_FRACTION_BITS;
+ 424              		.loc 1 100 9 is_stmt 1
+ 101:fft.c         **** 
+ 425              		.loc 1 101 9
+ 103:fft.c         ****         sR = cos_tb[k];
+ 426              		.loc 1 103 9
+ 427              	.LVL35:
+ 428              	.LBB42:
+ 429              	.LBB40:
+ 180:fft.c         ****     x |= (x >> 2);
+ 430              		.loc 1 180 5
+ 180:fft.c         ****     x |= (x >> 2);
+ 431              		.loc 1 180 13 is_stmt 0
+ 432 01ac 93D72F40 		srai	a5,t6,2
+ 180:fft.c         ****     x |= (x >> 2);
+ 433              		.loc 1 180 7
+ 434 01b0 B3E72701 		or	a5,a5,s2
+ 435              	.LVL36:
+ 181:fft.c         ****     x |= (x >> 4);
+ 436              		.loc 1 181 5 is_stmt 1
+ 181:fft.c         ****     x |= (x >> 4);
+ 437              		.loc 1 181 13 is_stmt 0
+ 438 01b4 13D72740 		srai	a4,a5,2
+ 181:fft.c         ****     x |= (x >> 4);
+ 439              		.loc 1 181 7
+ 440 01b8 D98F     		or	a5,a5,a4
+ 441              	.LVL37:
+ 182:fft.c         ****     x |= (x >> 8);
+ 442              		.loc 1 182 5 is_stmt 1
+ 182:fft.c         ****     x |= (x >> 8);
+ 443              		.loc 1 182 13 is_stmt 0
+ 444 01ba 13D74740 		srai	a4,a5,4
+ 182:fft.c         ****     x |= (x >> 8);
+ 445              		.loc 1 182 7
+ 446 01be D98F     		or	a5,a5,a4
+ 447              	.LVL38:
+ 183:fft.c         ****     x |= (x >> 16);
+ 448              		.loc 1 183 5 is_stmt 1
+ 183:fft.c         ****     x |= (x >> 16);
+ 449              		.loc 1 183 13 is_stmt 0
+ 450 01c0 13D78740 		srai	a4,a5,8
+ 183:fft.c         ****     x |= (x >> 16);
+ 451              		.loc 1 183 7
+ 452 01c4 D98F     		or	a5,a5,a4
+ 453              	.LVL39:
+ 184:fft.c         **** 
+ 454              		.loc 1 184 5 is_stmt 1
+ 184:fft.c         **** 
+ 455              		.loc 1 184 13 is_stmt 0
+ 456 01c6 13D70741 		srai	a4,a5,16
+ 457              	.LVL40:
+ 458              		.loc 1 186 5 is_stmt 1
+ 184:fft.c         **** 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 15
+
+
+ 459              		.loc 1 184 7 is_stmt 0
+ 460 01ca D98F     		or	a5,a5,a4
+ 461              	.LVL41:
+ 462              		.loc 1 186 13
+ 463 01cc 8587     		srai	a5,a5,1
+ 464              	.LVL42:
+ 465              	.LBB38:
+ 466              	.LBB36:
+ 166:fft.c         ****     for (c = 0; n; ++c) {
+ 467              		.loc 1 166 5 is_stmt 1
+ 167:fft.c         ****         n &= (n - 1);
+ 468              		.loc 1 167 5
+ 167:fft.c         ****         n &= (n - 1);
+ 469              		.loc 1 167 12 is_stmt 0
+ 470 01ce 0147     		li	a4,0
+ 471              	.LVL43:
+ 167:fft.c         ****         n &= (n - 1);
+ 472              		.loc 1 167 5
+ 473 01d0 91C7     		beq	a5,zero,.L11
+ 474              	.LVL44:
+ 475              	.L12:
+ 168:fft.c         ****     }
+ 476              		.loc 1 168 9 is_stmt 1
+ 168:fft.c         ****     }
+ 477              		.loc 1 168 17 is_stmt 0
+ 478 01d2 9386F7FF 		addi	a3,a5,-1
+ 168:fft.c         ****     }
+ 479              		.loc 1 168 11
+ 480 01d6 F58F     		and	a5,a5,a3
+ 481              	.LVL45:
+ 167:fft.c         ****         n &= (n - 1);
+ 482              		.loc 1 167 20
+ 483 01d8 0507     		addi	a4,a4,1
+ 484              	.LVL46:
+ 167:fft.c         ****         n &= (n - 1);
+ 485              		.loc 1 167 5
+ 486 01da E5FF     		bne	a5,zero,.L12
+ 487              	.LVL47:
+ 488              	.L11:
+ 489 01dc 0A07     		slli	a4,a4,2
+ 490 01de B387EB00 		add	a5,s7,a4
+ 491              	.LVL48:
+ 492 01e2 5A97     		add	a4,s6,a4
+ 493 01e4 0843     		lw	a0,0(a4)
+ 494 01e6 8043     		lw	s0,0(a5)
+ 495 01e8 0547     		li	a4,1
+ 170:fft.c         **** }
+ 496              		.loc 1 170 5 is_stmt 1
+ 497              	.LVL49:
+ 498              	.LBE36:
+ 499              	.LBE38:
+ 500              	.LBE40:
+ 501              	.LBE42:
+ 104:fft.c         ****         sI = -sin_tb[k];
+ 502              		.loc 1 104 9
+ 105:fft.c         ****         for (j = 1; j <= le2; j++) {          /* loop for each sub DFT */
+ 503              		.loc 1 105 9
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 16
+
+
+ 105:fft.c         ****         for (j = 1; j <= le2; j++) {          /* loop for each sub DFT */
+ 504              		.loc 1 105 14 is_stmt 0
+ 505 01ea 3305A040 		neg	a0,a0
+ 106:fft.c         ****             for (i = j - 1; i < N; i += le) { /* loop for each butterfly */
+ 506              		.loc 1 106 9 is_stmt 1
+ 507              	.LVL50:
+ 508 01ee E34320F1 		bgt	s2,zero,.L39
+ 509              	.LVL51:
+ 510              	.L24:
+  97:fft.c         ****         le = (int)(1 << l);
+ 511              		.loc 1 97 26 is_stmt 0
+ 512 01f2 050A     		addi	s4,s4,1
+ 513              	.LVL52:
+ 106:fft.c         ****             for (i = j - 1; i < N; i += le) { /* loop for each butterfly */
+ 514              		.loc 1 106 9
+ 515 01f4 014E     		li	t3,0
+ 516 01f6 93070010 		li	a5,256
+  97:fft.c         ****         le = (int)(1 << l);
+ 517              		.loc 1 97 5
+ 518 01fa E3153AFB 		bne	s4,s3,.L18
+ 519              	.LVL53:
+ 520              	.L38:
+ 521 01fe 09C7     		beq	a4,zero,.L26
+ 522 0200 2320FD00 		sw	a5,0(s10)
+ 523 0204 23A0CC01 		sw	t3,0(s9)
+ 524              	.LVL54:
+ 525              	.L26:
+ 128:fft.c         **** 
+ 526              		.loc 1 128 1
+ 527 0208 3254     		lw	s0,44(sp)
+ 528              		.cfi_remember_state
+ 529              		.cfi_restore 8
+ 530 020a A254     		lw	s1,40(sp)
+ 531              		.cfi_restore 9
+ 532 020c 1259     		lw	s2,36(sp)
+ 533              		.cfi_restore 18
+ 534 020e 8259     		lw	s3,32(sp)
+ 535              		.cfi_restore 19
+ 536 0210 724A     		lw	s4,28(sp)
+ 537              		.cfi_restore 20
+ 538 0212 E24A     		lw	s5,24(sp)
+ 539              		.cfi_restore 21
+ 540              	.LVL55:
+ 541 0214 524B     		lw	s6,20(sp)
+ 542              		.cfi_restore 22
+ 543 0216 C24B     		lw	s7,16(sp)
+ 544              		.cfi_restore 23
+ 545 0218 324C     		lw	s8,12(sp)
+ 546              		.cfi_restore 24
+ 547 021a A24C     		lw	s9,8(sp)
+ 548              		.cfi_restore 25
+ 549 021c 124D     		lw	s10,4(sp)
+ 550              		.cfi_restore 26
+ 551 021e 824D     		lw	s11,0(sp)
+ 552              		.cfi_restore 27
+ 553 0220 0145     		li	a0,0
+ 554 0222 4561     		addi	sp,sp,48
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 17
+
+
+ 555              	.LCFI1:
+ 556              		.cfi_def_cfa_offset 0
+ 557 0224 8280     		jr	ra
+ 558              	.LVL56:
+ 559              	.L2:
+ 560              	.LCFI2:
+ 561              		.cfi_restore_state
+ 562              	.LBB43:
+ 563              	.LBB25:
+ 564              	.LBB19:
+ 565              	.LBB17:
+ 170:fft.c         **** }
+ 566              		.loc 1 170 5 is_stmt 1
+ 567              	.LBE17:
+ 568              	.LBE19:
+ 569              	.LBE25:
+ 570              	.LBE43:
+  74:fft.c         ****     j = l;
+ 571              		.loc 1 74 5
+  75:fft.c         ****     ip = N - 2;
+ 572              		.loc 1 75 5
+  76:fft.c         ****     for (i = 1; i <= ip; i++) {
+ 573              		.loc 1 76 5
+  77:fft.c         ****         if (i < j) {
+ 574              		.loc 1 77 5
+ 575 0226 E34DA0E2 		bgt	a0,zero,.L20
+ 576 022a F9BF     		j	.L26
+ 577              		.cfi_endproc
+ 578              	.LFE0:
+ 580              		.section	.text.inverse_fft,"ax",@progbits
+ 581              		.align	1
+ 582              		.globl	inverse_fft
+ 584              	inverse_fft:
+ 585              	.LFB1:
+ 142:fft.c         ****     int k = 0;
+ 586              		.loc 1 142 45
+ 587              		.cfi_startproc
+ 588              	.LVL57:
+ 143:fft.c         **** 
+ 589              		.loc 1 143 5
+ 145:fft.c         ****         x[k].imag = -x[k].imag;
+ 590              		.loc 1 145 5
+ 142:fft.c         ****     int k = 0;
+ 591              		.loc 1 142 45 is_stmt 0
+ 592 0000 4111     		addi	sp,sp,-16
+ 593              	.LCFI3:
+ 594              		.cfi_def_cfa_offset 16
+ 595 0002 06C6     		sw	ra,12(sp)
+ 596 0004 22C4     		sw	s0,8(sp)
+ 597 0006 26C2     		sw	s1,4(sp)
+ 598 0008 4AC0     		sw	s2,0(sp)
+ 599              		.cfi_offset 1, -4
+ 600              		.cfi_offset 8, -8
+ 601              		.cfi_offset 9, -12
+ 602              		.cfi_offset 18, -16
+ 145:fft.c         ****         x[k].imag = -x[k].imag;
+ 603              		.loc 1 145 5
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 18
+
+
+ 604 000a 635DB004 		ble	a1,zero,.L41
+ 605 000e 93943500 		slli	s1,a1,3
+ 606 0012 2E89     		mv	s2,a1
+ 607 0014 AA86     		mv	a3,a0
+ 608 0016 2A84     		mv	s0,a0
+ 609 0018 AA94     		add	s1,s1,a0
+ 610 001a AA87     		mv	a5,a0
+ 611              	.LVL58:
+ 612              	.L42:
+ 146:fft.c         ****     }
+ 613              		.loc 1 146 9 is_stmt 1 discriminator 3
+ 146:fft.c         ****     }
+ 614              		.loc 1 146 21 is_stmt 0 discriminator 3
+ 615 001c D843     		lw	a4,4(a5)
+ 616 001e A107     		addi	a5,a5,8
+ 617 0020 3307E040 		neg	a4,a4
+ 146:fft.c         ****     }
+ 618              		.loc 1 146 19 discriminator 3
+ 619 0024 23AEE7FE 		sw	a4,-4(a5)
+ 145:fft.c         ****         x[k].imag = -x[k].imag;
+ 620              		.loc 1 145 5 discriminator 3
+ 621 0028 E39A97FE 		bne	a5,s1,.L42
+ 149:fft.c         **** 
+ 622              		.loc 1 149 5 is_stmt 1
+ 623 002c CA85     		mv	a1,s2
+ 624              	.LVL59:
+ 625 002e 3685     		mv	a0,a3
+ 626 0030 97000000 		call	fft
+ 626      E7800000 
+ 627              	.LVL60:
+ 151:fft.c         ****         x[k].real = x[k].real / N;
+ 628              		.loc 1 151 5
+ 629              	.L44:
+ 152:fft.c         ****         x[k].imag = -x[k].imag / N;
+ 630              		.loc 1 152 9 discriminator 3
+ 153:fft.c         ****     }
+ 631              		.loc 1 153 21 is_stmt 0 discriminator 3
+ 632 0038 5C40     		lw	a5,4(s0)
+ 152:fft.c         ****         x[k].imag = -x[k].imag / N;
+ 633              		.loc 1 152 31 discriminator 3
+ 634 003a 1840     		lw	a4,0(s0)
+ 635 003c 2104     		addi	s0,s0,8
+ 153:fft.c         ****     }
+ 636              		.loc 1 153 21 discriminator 3
+ 637 003e B307F040 		neg	a5,a5
+ 152:fft.c         ****         x[k].imag = -x[k].imag / N;
+ 638              		.loc 1 152 31 discriminator 3
+ 639 0042 33472703 		div	a4,a4,s2
+ 153:fft.c         ****     }
+ 640              		.loc 1 153 32 discriminator 3
+ 641 0046 B3C72703 		div	a5,a5,s2
+ 152:fft.c         ****         x[k].imag = -x[k].imag / N;
+ 642              		.loc 1 152 19 discriminator 3
+ 643 004a 232CE4FE 		sw	a4,-8(s0)
+ 153:fft.c         ****     }
+ 644              		.loc 1 153 9 is_stmt 1 discriminator 3
+ 153:fft.c         ****     }
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 19
+
+
+ 645              		.loc 1 153 19 is_stmt 0 discriminator 3
+ 646 004e 232EF4FE 		sw	a5,-4(s0)
+ 151:fft.c         ****         x[k].real = x[k].real / N;
+ 647              		.loc 1 151 5 discriminator 3
+ 648 0052 E31394FE 		bne	s0,s1,.L44
+ 157:fft.c         **** 
+ 649              		.loc 1 157 1
+ 650 0056 B240     		lw	ra,12(sp)
+ 651              		.cfi_remember_state
+ 652              		.cfi_restore 1
+ 653 0058 2244     		lw	s0,8(sp)
+ 654              		.cfi_restore 8
+ 655 005a 9244     		lw	s1,4(sp)
+ 656              		.cfi_restore 9
+ 657 005c 0249     		lw	s2,0(sp)
+ 658              		.cfi_restore 18
+ 659              	.LVL61:
+ 660 005e 0145     		li	a0,0
+ 661 0060 4101     		addi	sp,sp,16
+ 662              	.LCFI4:
+ 663              		.cfi_def_cfa_offset 0
+ 664 0062 8280     		jr	ra
+ 665              	.LVL62:
+ 666              	.L41:
+ 667              	.LCFI5:
+ 668              		.cfi_restore_state
+ 149:fft.c         **** 
+ 669              		.loc 1 149 5 is_stmt 1
+ 670 0064 97000000 		call	fft
+ 670      E7800000 
+ 671              	.LVL63:
+ 151:fft.c         ****         x[k].real = x[k].real / N;
+ 672              		.loc 1 151 5
+ 156:fft.c         **** }
+ 673              		.loc 1 156 5
+ 157:fft.c         **** 
+ 674              		.loc 1 157 1 is_stmt 0
+ 675 006c B240     		lw	ra,12(sp)
+ 676              		.cfi_restore 1
+ 677 006e 2244     		lw	s0,8(sp)
+ 678              		.cfi_restore 8
+ 679 0070 9244     		lw	s1,4(sp)
+ 680              		.cfi_restore 9
+ 681 0072 0249     		lw	s2,0(sp)
+ 682              		.cfi_restore 18
+ 683 0074 0145     		li	a0,0
+ 684 0076 4101     		addi	sp,sp,16
+ 685              	.LCFI6:
+ 686              		.cfi_def_cfa_offset 0
+ 687 0078 8280     		jr	ra
+ 688              		.cfi_endproc
+ 689              	.LFE1:
+ 691              		.section	.rodata.cos_tb,"a"
+ 692              		.align	2
+ 693              		.set	.LANCHOR0,. + 0
+ 696              	cos_tb:
+ 697 0000 00FFFFFF 		.word	-256
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 20
+
+
+ 698 0004 00000000 		.word	0
+ 699 0008 B5000000 		.word	181
+ 700 000c ED000000 		.word	237
+ 701 0010 FB000000 		.word	251
+ 702 0014 FF000000 		.word	255
+ 703 0018 00010000 		.word	256
+ 704 001c 00010000 		.word	256
+ 705 0020 00010000 		.word	256
+ 706 0024 00010000 		.word	256
+ 707 0028 00010000 		.word	256
+ 708 002c 00010000 		.word	256
+ 709 0030 00010000 		.word	256
+ 710 0034 00010000 		.word	256
+ 711 0038 00010000 		.word	256
+ 712 003c 00010000 		.word	256
+ 713 0040 00010000 		.word	256
+ 714 0044 00010000 		.word	256
+ 715 0048 00010000 		.word	256
+ 716 004c 00010000 		.word	256
+ 717 0050 00010000 		.word	256
+ 718              		.section	.rodata.sin_tb,"a"
+ 719              		.align	2
+ 720              		.set	.LANCHOR1,. + 0
+ 723              	sin_tb:
+ 724 0000 00000000 		.word	0
+ 725 0004 00010000 		.word	256
+ 726 0008 B5000000 		.word	181
+ 727 000c 62000000 		.word	98
+ 728 0010 32000000 		.word	50
+ 729 0014 19000000 		.word	25
+ 730 0018 0D000000 		.word	13
+ 731 001c 06000000 		.word	6
+ 732 0020 03000000 		.word	3
+ 733 0024 02000000 		.word	2
+ 734 0028 01000000 		.word	1
+ 735 002c 00000000 		.word	0
+ 736 0030 00000000 		.word	0
+ 737 0034 00000000 		.word	0
+ 738 0038 00000000 		.word	0
+ 739 003c 00000000 		.word	0
+ 740 0040 00000000 		.word	0
+ 741 0044 00000000 		.word	0
+ 742 0048 00000000 		.word	0
+ 743 004c 00000000 		.word	0
+ 744 0050 00000000 		.word	0
+ 745              		.section	.sbss.uI.1591,"aw",@nobits
+ 746              		.align	2
+ 747              		.set	.LANCHOR3,. + 0
+ 750              	uI.1591:
+ 751 0000 00000000 		.zero	4
+ 752              		.section	.sbss.uR.1590,"aw",@nobits
+ 753              		.align	2
+ 754              		.set	.LANCHOR2,. + 0
+ 757              	uR.1590:
+ 758 0000 00000000 		.zero	4
+ 759              		.text
+ 760              	.Letext0:
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 21
+
+
+ 761              		.file 2 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+ 762              		.file 3 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+ 763              		.file 4 "fft.h"
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 fft.c
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:13     .text.fft:0000000000000000 fft
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:17     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:19     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:20     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:21     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:22     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:23     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:24     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:27     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:28     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:29     .text.fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:31     .text.fft:0000000000000004 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:34     .text.fft:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:35     .text.fft:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:37     .text.fft:000000000000000c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:40     .text.fft:000000000000000e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:41     .text.fft:000000000000000e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:43     .text.fft:0000000000000012 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:46     .text.fft:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:47     .text.fft:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:51     .text.fft:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:53     .text.fft:000000000000001a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:57     .text.fft:000000000000001a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:62     .text.fft:000000000000001c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:63     .text.fft:000000000000001c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:64     .text.fft:000000000000001e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:68     .text.fft:000000000000001e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:71     .text.fft:0000000000000022 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:72     .text.fft:0000000000000022 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:77     .text.fft:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:88     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:89     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:90     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:91     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:92     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:93     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:94     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:95     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:96     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:97     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:98     .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:102    .text.fft:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:107    .text.fft:0000000000000040 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:112    .text.fft:0000000000000040 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:113    .text.fft:0000000000000040 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:121    .text.fft:0000000000000046 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:123    .text.fft:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:127    .text.fft:000000000000004c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:128    .text.fft:000000000000004c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:130    .text.fft:0000000000000050 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:133    .text.fft:0000000000000054 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:136    .text.fft:0000000000000056 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:138    .text.fft:000000000000005a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:139    .text.fft:000000000000005a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:146    .text.fft:000000000000005c .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 23
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:147    .text.fft:000000000000005c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:148    .text.fft:000000000000005c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:149    .text.fft:000000000000005c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:156    .text.fft:0000000000000064 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:163    .text.fft:0000000000000068 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:164    .text.fft:0000000000000068 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:166    .text.fft:000000000000006c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:167    .text.fft:000000000000006c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:169    .text.fft:0000000000000070 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:172    .text.fft:0000000000000076 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:174    .text.fft:000000000000007a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:175    .text.fft:000000000000007a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:177    .text.fft:000000000000007e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:179    .text.fft:0000000000000082 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:181    .text.fft:0000000000000086 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:182    .text.fft:0000000000000086 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:183    .text.fft:0000000000000086 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:185    .text.fft:000000000000008a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:186    .text.fft:000000000000008a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:188    .text.fft:000000000000008e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:189    .text.fft:000000000000008e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:193    .text.fft:0000000000000092 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:194    .text.fft:0000000000000092 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:195    .text.fft:0000000000000092 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:200    .text.fft:0000000000000098 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:201    .text.fft:0000000000000098 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:204    .text.fft:000000000000009a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:205    .text.fft:000000000000009a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:208    .text.fft:000000000000009c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:211    .text.fft:00000000000000a0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:212    .text.fft:00000000000000a0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:215    .text.fft:00000000000000a2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:219    .text.fft:00000000000000a6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:223    .text.fft:00000000000000aa .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:225    .text.fft:00000000000000ae .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:226    .text.fft:00000000000000ae .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:227    .text.fft:00000000000000ae .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:228    .text.fft:00000000000000ae .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:230    .text.fft:00000000000000b2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:232    .text.fft:00000000000000b6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:234    .text.fft:00000000000000ba .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:236    .text.fft:00000000000000be .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:238    .text.fft:00000000000000c2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:242    .text.fft:00000000000000cc .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:244    .text.fft:00000000000000d0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:245    .text.fft:00000000000000d0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:250    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:251    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:252    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:253    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:254    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:255    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:258    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:259    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:264    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:265    .text.fft:00000000000000d4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:268    .text.fft:00000000000000d8 .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 24
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:271    .text.fft:00000000000000de .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:273    .text.fft:00000000000000e0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:287    .text.fft:00000000000000ec .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:288    .text.fft:00000000000000ec .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:289    .text.fft:00000000000000ec .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:290    .text.fft:00000000000000ec .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:293    .text.fft:00000000000000f0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:306    .text.fft:000000000000010a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:307    .text.fft:000000000000010a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:311    .text.fft:0000000000000110 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:316    .text.fft:0000000000000116 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:317    .text.fft:0000000000000116 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:318    .text.fft:0000000000000116 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:320    .text.fft:000000000000011a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:322    .text.fft:000000000000011e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:324    .text.fft:0000000000000122 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:326    .text.fft:0000000000000126 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:329    .text.fft:0000000000000128 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:331    .text.fft:000000000000012c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:333    .text.fft:0000000000000130 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:335    .text.fft:0000000000000134 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:337    .text.fft:0000000000000136 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:339    .text.fft:000000000000013a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:340    .text.fft:000000000000013a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:342    .text.fft:000000000000013e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:344    .text.fft:0000000000000142 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:346    .text.fft:0000000000000146 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:348    .text.fft:000000000000014a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:350    .text.fft:000000000000014c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:352    .text.fft:000000000000014e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:354    .text.fft:0000000000000150 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:355    .text.fft:0000000000000150 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:356    .text.fft:0000000000000150 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:358    .text.fft:0000000000000154 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:360    .text.fft:0000000000000158 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:361    .text.fft:0000000000000158 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:363    .text.fft:000000000000015c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:366    .text.fft:0000000000000162 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:368    .text.fft:0000000000000164 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:370    .text.fft:0000000000000166 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:373    .text.fft:000000000000016a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:374    .text.fft:000000000000016a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:377    .text.fft:0000000000000170 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:380    .text.fft:0000000000000174 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:381    .text.fft:0000000000000174 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:382    .text.fft:0000000000000174 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:387    .text.fft:000000000000017c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:389    .text.fft:0000000000000180 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:391    .text.fft:0000000000000182 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:393    .text.fft:0000000000000186 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:395    .text.fft:0000000000000188 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:397    .text.fft:000000000000018a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:398    .text.fft:000000000000018a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:400    .text.fft:000000000000018c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:402    .text.fft:0000000000000190 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:404    .text.fft:0000000000000192 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:406    .text.fft:0000000000000196 .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 25
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:409    .text.fft:0000000000000198 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:411    .text.fft:000000000000019c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:415    .text.fft:00000000000001a0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:419    .text.fft:00000000000001a4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:420    .text.fft:00000000000001a4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:422    .text.fft:00000000000001a8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:423    .text.fft:00000000000001a8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:425    .text.fft:00000000000001ac .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:426    .text.fft:00000000000001ac .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:430    .text.fft:00000000000001ac .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:431    .text.fft:00000000000001ac .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:432    .text.fft:00000000000001ac .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:434    .text.fft:00000000000001b0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:437    .text.fft:00000000000001b4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:438    .text.fft:00000000000001b4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:440    .text.fft:00000000000001b8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:443    .text.fft:00000000000001ba .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:444    .text.fft:00000000000001ba .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:446    .text.fft:00000000000001be .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:449    .text.fft:00000000000001c0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:450    .text.fft:00000000000001c0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:452    .text.fft:00000000000001c4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:455    .text.fft:00000000000001c6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:456    .text.fft:00000000000001c6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:459    .text.fft:00000000000001ca .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:460    .text.fft:00000000000001ca .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:463    .text.fft:00000000000001cc .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:468    .text.fft:00000000000001ce .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:469    .text.fft:00000000000001ce .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:470    .text.fft:00000000000001ce .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:473    .text.fft:00000000000001d0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:477    .text.fft:00000000000001d2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:478    .text.fft:00000000000001d2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:480    .text.fft:00000000000001d6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:483    .text.fft:00000000000001d8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:486    .text.fft:00000000000001da .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:502    .text.fft:00000000000001ea .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:503    .text.fft:00000000000001ea .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:504    .text.fft:00000000000001ea .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:505    .text.fft:00000000000001ea .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:508    .text.fft:00000000000001ee .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:512    .text.fft:00000000000001f2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:515    .text.fft:00000000000001f4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:518    .text.fft:00000000000001fa .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:527    .text.fft:0000000000000208 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:528    .text.fft:000000000000020a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:529    .text.fft:000000000000020a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:531    .text.fft:000000000000020c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:533    .text.fft:000000000000020e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:535    .text.fft:0000000000000210 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:537    .text.fft:0000000000000212 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:539    .text.fft:0000000000000214 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:542    .text.fft:0000000000000216 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:544    .text.fft:0000000000000218 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:546    .text.fft:000000000000021a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:548    .text.fft:000000000000021c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:550    .text.fft:000000000000021e .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 26
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:552    .text.fft:0000000000000220 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:556    .text.fft:0000000000000224 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:561    .text.fft:0000000000000226 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:571    .text.fft:0000000000000226 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:572    .text.fft:0000000000000226 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:573    .text.fft:0000000000000226 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:574    .text.fft:0000000000000226 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:575    .text.fft:0000000000000226 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:577    .text.fft:000000000000022c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:584    .text.inverse_fft:0000000000000000 inverse_fft
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:587    .text.inverse_fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:589    .text.inverse_fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:590    .text.inverse_fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:591    .text.inverse_fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:592    .text.inverse_fft:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:594    .text.inverse_fft:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:599    .text.inverse_fft:000000000000000a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:600    .text.inverse_fft:000000000000000a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:601    .text.inverse_fft:000000000000000a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:602    .text.inverse_fft:000000000000000a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:604    .text.inverse_fft:000000000000000a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:614    .text.inverse_fft:000000000000001c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:615    .text.inverse_fft:000000000000001c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:619    .text.inverse_fft:0000000000000024 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:621    .text.inverse_fft:0000000000000028 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:623    .text.inverse_fft:000000000000002c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:630    .text.inverse_fft:0000000000000038 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:631    .text.inverse_fft:0000000000000038 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:632    .text.inverse_fft:0000000000000038 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:634    .text.inverse_fft:000000000000003a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:637    .text.inverse_fft:000000000000003e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:639    .text.inverse_fft:0000000000000042 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:641    .text.inverse_fft:0000000000000046 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:643    .text.inverse_fft:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:645    .text.inverse_fft:000000000000004e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:646    .text.inverse_fft:000000000000004e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:648    .text.inverse_fft:0000000000000052 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:650    .text.inverse_fft:0000000000000056 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:651    .text.inverse_fft:0000000000000058 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:652    .text.inverse_fft:0000000000000058 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:654    .text.inverse_fft:000000000000005a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:656    .text.inverse_fft:000000000000005c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:658    .text.inverse_fft:000000000000005e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:663    .text.inverse_fft:0000000000000062 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:668    .text.inverse_fft:0000000000000064 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:670    .text.inverse_fft:0000000000000064 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:673    .text.inverse_fft:000000000000006c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:674    .text.inverse_fft:000000000000006c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:675    .text.inverse_fft:000000000000006c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:676    .text.inverse_fft:000000000000006e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:678    .text.inverse_fft:0000000000000070 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:680    .text.inverse_fft:0000000000000072 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:682    .text.inverse_fft:0000000000000074 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:686    .text.inverse_fft:0000000000000078 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:688    .text.inverse_fft:000000000000007a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:693    .rodata.cos_tb:0000000000000000 .LANCHOR0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:696    .rodata.cos_tb:0000000000000000 cos_tb
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 27
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:720    .rodata.sin_tb:0000000000000000 .LANCHOR1
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:723    .rodata.sin_tb:0000000000000000 sin_tb
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:747    .sbss.uI.1591:0000000000000000 .LANCHOR3
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:750    .sbss.uI.1591:0000000000000000 uI.1591
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:754    .sbss.uR.1590:0000000000000000 .LANCHOR2
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:757    .sbss.uR.1590:0000000000000000 uR.1590
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:580    .text.fft:000000000000022c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:691    .text.inverse_fft:000000000000007a .L0 
+                     .debug_frame:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:559    .text.fft:0000000000000226 .L2
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:125    .text.fft:000000000000004c .L3
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:221    .text.fft:00000000000000aa .L4
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:190    .text.fft:0000000000000092 .L5
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:209    .text.fft:00000000000000a0 .L6
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:198    .text.fft:0000000000000098 .L7
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:159    .text.fft:0000000000000068 .L8
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:525    .text.fft:0000000000000208 .L26
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:510    .text.fft:00000000000001f2 .L24
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:378    .text.fft:0000000000000174 .L17
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:314    .text.fft:0000000000000116 .L16
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:304    .text.fft:000000000000010a .L15
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:520    .text.fft:00000000000001fe .L38
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:488    .text.fft:00000000000001dc .L11
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:475    .text.fft:00000000000001d2 .L12
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:295    .text.fft:00000000000000f4 .L39
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:417    .text.fft:00000000000001a4 .L18
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:151    .text.fft:0000000000000060 .L20
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:666    .text.inverse_fft:0000000000000064 .L41
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:612    .text.inverse_fft:000000000000001c .L42
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:629    .text.inverse_fft:0000000000000038 .L44
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1169   .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2398   .debug_str:0000000000000000 .LASF18
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2428   .debug_str:000000000000014d .LASF19
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2416   .debug_str:00000000000000d6 .LASF20
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2348   .debug_ranges:0000000000000000 .Ldebug_ranges0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2396   .debug_line:0000000000000000 .Ldebug_line0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2440   .debug_str:0000000000000189 .LASF0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2406   .debug_str:0000000000000094 .LASF1
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2434   .debug_str:000000000000016f .LASF2
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2412   .debug_str:00000000000000bb .LASF3
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2400   .debug_str:000000000000007a .LASF9
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2438   .debug_str:0000000000000180 .LASF4
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2410   .debug_str:00000000000000a9 .LASF5
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2432   .debug_str:0000000000000161 .LASF6
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2426   .debug_str:0000000000000136 .LASF7
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2422   .debug_str:0000000000000124 .LASF8
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2402   .debug_str:0000000000000084 .LASF10
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2424   .debug_str:0000000000000131 .LASF11
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2418   .debug_str:0000000000000113 .LASF12
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2404   .debug_str:000000000000008c .LASF13
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2408   .debug_str:00000000000000a2 .LASF14
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2436   .debug_str:0000000000000179 .LASF15
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2430   .debug_str:0000000000000153 .LASF16
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2414   .debug_str:00000000000000ce .LASF17
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2420   .debug_str:0000000000000118 .LASF21
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:585    .text.inverse_fft:0000000000000000 .LFB1
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:689    .text.inverse_fft:000000000000007a .LFE1
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 28
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1579   .debug_loc:0000000000000000 .LLST13
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1607   .debug_loc:0000000000000044 .LLST14
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1636   .debug_loc:0000000000000089 .LLST15
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1665   .debug_loc:00000000000000ce .LLST16
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:627    .text.inverse_fft:0000000000000038 .LVL60
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:671    .text.inverse_fft:000000000000006c .LVL63
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:14     .text.fft:0000000000000000 .LFB0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:578    .text.fft:000000000000022c .LFE0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1678   .debug_loc:00000000000000ee .LLST0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1701   .debug_loc:0000000000000126 .LLST1
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1723   .debug_loc:000000000000015d .LLST2
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1762   .debug_loc:00000000000001c1 .LLST3
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1797   .debug_loc:000000000000021a .LLST4
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1821   .debug_loc:000000000000025a .LLST5
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1832   .debug_loc:0000000000000278 .LLST6
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:25     .text.fft:0000000000000000 .LBB12
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:1847   .debug_loc:000000000000029a .LLST7
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:104    .text.fft:0000000000000040 .LBB14
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2011   .debug_loc:000000000000036d .LLST8
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2018   .debug_loc:0000000000000380 .LLST9
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:248    .text.fft:00000000000000d4 .LBB31
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2030   .debug_loc:000000000000039f .LLST10
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:256    .text.fft:00000000000000d4 .LBB33
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2304   .debug_loc:00000000000004e7 .LLST11
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:2316   .debug_loc:0000000000000506 .LLST12
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:593    .text.inverse_fft:0000000000000002 .LCFI3
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:662    .text.inverse_fft:0000000000000062 .LCFI4
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:667    .text.inverse_fft:0000000000000064 .LCFI5
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:685    .text.inverse_fft:0000000000000078 .LCFI6
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:588    .text.inverse_fft:0000000000000000 .LVL57
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:611    .text.inverse_fft:000000000000001c .LVL58
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:665    .text.inverse_fft:0000000000000064 .LVL62
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:624    .text.inverse_fft:000000000000002e .LVL59
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:659    .text.inverse_fft:000000000000005e .LVL61
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:52     .text.fft:000000000000001a .LCFI0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:555    .text.fft:0000000000000224 .LCFI1
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:560    .text.fft:0000000000000226 .LCFI2
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:18     .text.fft:0000000000000000 .LVL0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:115    .text.fft:0000000000000046 .LVL8
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:540    .text.fft:0000000000000214 .LVL55
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:558    .text.fft:0000000000000226 .LVL56
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:140    .text.fft:000000000000005c .LVL12
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:158    .text.fft:0000000000000068 .LVL14
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:213    .text.fft:00000000000000a2 .LVL19
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:216    .text.fft:00000000000000a4 .LVL20
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:220    .text.fft:00000000000000aa .LVL21
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:308    .text.fft:000000000000010c .LVL27
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:313    .text.fft:0000000000000116 .LVL28
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:327    .text.fft:0000000000000128 .LVL29
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:372    .text.fft:000000000000016a .LVL30
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:416    .text.fft:00000000000001a4 .LVL34
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:292    .text.fft:00000000000000f0 .LVL24
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:303    .text.fft:000000000000010a .LVL26
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:384    .text.fft:000000000000017a .LVL31
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:407    .text.fft:0000000000000198 .LVL32
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:507    .text.fft:00000000000001ee .LVL50
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:519    .text.fft:00000000000001fe .LVL53
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s 			page 29
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:294    .text.fft:00000000000000f4 .LVL25
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:412    .text.fft:000000000000019e .LVL33
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:509    .text.fft:00000000000001f2 .LVL51
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:513    .text.fft:00000000000001f4 .LVL52
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:524    .text.fft:0000000000000208 .LVL54
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:192    .text.fft:0000000000000092 .LVL15
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:197    .text.fft:0000000000000098 .LVL16
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:150    .text.fft:0000000000000060 .LVL13
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:32     .text.fft:0000000000000008 .LVL1
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:69     .text.fft:0000000000000022 .LVL5
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:73     .text.fft:0000000000000026 .LVL6
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:103    .text.fft:0000000000000040 .LVL7
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:124    .text.fft:000000000000004c .LVL9
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:247    .text.fft:00000000000000d4 .LVL22
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:282    .text.fft:00000000000000ec .LVL23
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:427    .text.fft:00000000000001ac .LVL35
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:435    .text.fft:00000000000001b4 .LVL36
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:457    .text.fft:00000000000001ca .LVL40
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:461    .text.fft:00000000000001cc .LVL41
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:464    .text.fft:00000000000001ce .LVL42
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:471    .text.fft:00000000000001d0 .LVL43
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:497    .text.fft:00000000000001ea .LVL49
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:491    .text.fft:00000000000001e2 .LVL48
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:474    .text.fft:00000000000001d2 .LVL44
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:487    .text.fft:00000000000001dc .LVL47
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:765    .debug_info:0000000000000000 .Ldebug_info0
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:49     .text.fft:0000000000000018 .LBE12
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:54     .text.fft:000000000000001a .LBB26
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:61     .text.fft:000000000000001c .LBE26
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:65     .text.fft:000000000000001e .LBB27
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:75     .text.fft:0000000000000026 .LBE27
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:99     .text.fft:000000000000003c .LBB28
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:111    .text.fft:0000000000000040 .LBE28
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:116    .text.fft:0000000000000046 .LBB29
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:144    .text.fft:000000000000005c .LBE29
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:153    .text.fft:0000000000000064 .LBB30
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:161    .text.fft:0000000000000068 .LBE30
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:562    .text.fft:0000000000000226 .LBB43
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:570    .text.fft:0000000000000226 .LBE43
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:109    .text.fft:0000000000000040 .LBE14
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:118    .text.fft:0000000000000046 .LBB18
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:142    .text.fft:000000000000005c .LBE18
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:564    .text.fft:0000000000000226 .LBB19
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:568    .text.fft:0000000000000226 .LBE19
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:263    .text.fft:00000000000000d4 .LBE31
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:277    .text.fft:00000000000000ec .LBB41
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:286    .text.fft:00000000000000ec .LBE41
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:428    .text.fft:00000000000001ac .LBB42
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:501    .text.fft:00000000000001ea .LBE42
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:261    .text.fft:00000000000000d4 .LBE33
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:279    .text.fft:00000000000000ec .LBB37
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:284    .text.fft:00000000000000ec .LBE37
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:465    .text.fft:00000000000001ce .LBB38
+C:\Users\Jesper\AppData\Local\Temp\ccGmcvYA.s:499    .text.fft:00000000000001ea .LBE38
+
+NO UNDEFINED SYMBOLS

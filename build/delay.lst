@@ -1,0 +1,1262 @@
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 1
+
+
+   1              		.file	"delay.c"
+   2              		.option nopic
+   3              		.attribute arch, "rv32i2p0_m2p0_a2p0_c2p0"
+   4              		.attribute unaligned_access, 0
+   5              		.attribute stack_align, 16
+   6              		.text
+   7              	.Ltext0:
+   8              		.cfi_sections	.debug_frame
+   9              		.section	.text.delay_7812us,"ax",@progbits
+  10              		.align	1
+  11              		.globl	delay_7812us
+  13              	delay_7812us:
+  14              	.LFB2:
+  15              		.file 1 "delay.c"
+   1:delay.c       **** /*!
+   2:delay.c       ****     \file  systick.c
+   3:delay.c       ****     \brief the systick configuration file
+   4:delay.c       ****     \version 2019-6-5, V1.0.0, firmware for GD32VF103
+   5:delay.c       **** */
+   6:delay.c       **** 
+   7:delay.c       **** /*
+   8:delay.c       ****     Copyright (c) 2019, GigaDevice Semiconductor Inc.
+   9:delay.c       ****     Redistribution and use in source and binary forms, with or without modification, 
+  10:delay.c       **** are permitted provided that the following conditions are met:
+  11:delay.c       ****     1. Redistributions of source code must retain the above copyright notice, this 
+  12:delay.c       ****        list of conditions and the following disclaimer.
+  13:delay.c       ****     2. Redistributions in binary form must reproduce the above copyright notice, 
+  14:delay.c       ****        this list of conditions and the following disclaimer in the documentation 
+  15:delay.c       ****        and/or other materials provided with the distribution.
+  16:delay.c       ****     3. Neither the name of the copyright holder nor the names of its contributors 
+  17:delay.c       ****        may be used to endorse or promote products derived from this software without 
+  18:delay.c       ****        specific prior written permission.
+  19:delay.c       ****     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+  20:delay.c       **** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+  21:delay.c       **** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+  22:delay.c       **** IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+  23:delay.c       **** INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  24:delay.c       **** NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+  25:delay.c       **** PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+  26:delay.c       **** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  27:delay.c       **** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+  28:delay.c       **** OF SUCH DAMAGE.
+  29:delay.c       **** */
+  30:delay.c       **** 
+  31:delay.c       **** #include "gd32vf103.h"
+  32:delay.c       **** #include "delay.h"
+  33:delay.c       **** 
+  34:delay.c       **** /*!
+  35:delay.c       ****     \brief      delay a time in milliseconds
+  36:delay.c       ****     \param[in]  count: count in milliseconds
+  37:delay.c       ****     \param[out] none
+  38:delay.c       ****     \retval     none
+  39:delay.c       **** */
+  40:delay.c       **** uint64_t delay_until = 0;
+  41:delay.c       **** 
+  42:delay.c       **** void delay_7812us(uint64_t current_time){
+  16              		.loc 1 42 41
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 2
+
+
+  17              		.cfi_startproc
+  18              	.LVL0:
+  43:delay.c       ****     current_time+=13824;
+  19              		.loc 1 43 5
+  42:delay.c       ****     current_time+=13824;
+  20              		.loc 1 42 41 is_stmt 0
+  21 0000 4111     		addi	sp,sp,-16
+  22              	.LCFI0:
+  23              		.cfi_def_cfa_offset 16
+  24 0002 26C2     		sw	s1,4(sp)
+  25              		.cfi_offset 9, -12
+  26              		.loc 1 43 17
+  27 0004 8D64     		li	s1,12288
+  28 0006 93840460 		addi	s1,s1,1536
+  29 000a AA94     		add	s1,a0,s1
+  30 000c 33B5A400 		sltu	a0,s1,a0
+  31              	.LVL1:
+  42:delay.c       ****     current_time+=13824;
+  32              		.loc 1 42 41
+  33 0010 22C4     		sw	s0,8(sp)
+  34 0012 06C6     		sw	ra,12(sp)
+  35              		.cfi_offset 8, -8
+  36              		.cfi_offset 1, -4
+  37              		.loc 1 43 17
+  38 0014 3304B500 		add	s0,a0,a1
+  39              	.LVL2:
+  44:delay.c       ****     uint64_t start_time = 0;
+  40              		.loc 1 44 5 is_stmt 1
+  41              	.L4:
+  45:delay.c       ****     do
+  42              		.loc 1 45 5 discriminator 1
+  46:delay.c       ****     {
+  47:delay.c       ****         start_time = get_timer_value();
+  43              		.loc 1 47 9 discriminator 1
+  44              		.loc 1 47 22 is_stmt 0 discriminator 1
+  45 0018 97000000 		call	get_timer_value
+  45      E7800000 
+  46              	.LVL3:
+  48:delay.c       ****     } while (start_time < current_time);
+  47              		.loc 1 48 5 discriminator 1
+  48 0020 E3EC85FE 		bgtu	s0,a1,.L4
+  49 0024 6314B400 		bne	s0,a1,.L1
+  50 0028 E36895FE 		bgtu	s1,a0,.L4
+  51              	.L1:
+  49:delay.c       ****     
+  50:delay.c       **** }
+  52              		.loc 1 50 1
+  53 002c B240     		lw	ra,12(sp)
+  54              		.cfi_restore 1
+  55 002e 2244     		lw	s0,8(sp)
+  56              		.cfi_restore 8
+  57              	.LVL4:
+  58 0030 9244     		lw	s1,4(sp)
+  59              		.cfi_restore 9
+  60 0032 4101     		addi	sp,sp,16
+  61              	.LCFI1:
+  62              		.cfi_def_cfa_offset 0
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 3
+
+
+  63 0034 8280     		jr	ra
+  64              		.cfi_endproc
+  65              	.LFE2:
+  67              		.globl	__floatundidf
+  68              		.globl	__floatunsidf
+  69              		.globl	__divdf3
+  70              		.globl	__muldf3
+  71              		.globl	__ltdf2
+  72              		.section	.text.delay_1ms,"ax",@progbits
+  73              		.align	1
+  74              		.globl	delay_1ms
+  76              	delay_1ms:
+  77              	.LFB3:
+  51:delay.c       **** 
+  52:delay.c       **** void delay_1ms(uint32_t count)
+  53:delay.c       **** {
+  78              		.loc 1 53 1 is_stmt 1
+  79              		.cfi_startproc
+  80              	.LVL5:
+  54:delay.c       **** 	uint64_t start_mtime, delta_mtime;
+  81              		.loc 1 54 2
+  55:delay.c       **** 
+  56:delay.c       **** 	// Don't start measuruing until we see an mtime tick
+  57:delay.c       **** 	uint64_t tmp = get_timer_value();
+  82              		.loc 1 57 2
+  53:delay.c       **** 	uint64_t start_mtime, delta_mtime;
+  83              		.loc 1 53 1 is_stmt 0
+  84 0000 7971     		addi	sp,sp,-48
+  85              	.LCFI2:
+  86              		.cfi_def_cfa_offset 48
+  87 0002 4AD0     		sw	s2,32(sp)
+  88 0004 4ECE     		sw	s3,28(sp)
+  89 0006 5EC6     		sw	s7,12(sp)
+  90 0008 06D6     		sw	ra,44(sp)
+  91 000a 22D4     		sw	s0,40(sp)
+  92 000c 26D2     		sw	s1,36(sp)
+  93 000e 52CC     		sw	s4,24(sp)
+  94 0010 56CA     		sw	s5,20(sp)
+  95 0012 5AC8     		sw	s6,16(sp)
+  96 0014 62C4     		sw	s8,8(sp)
+  97 0016 66C2     		sw	s9,4(sp)
+  98              		.cfi_offset 18, -16
+  99              		.cfi_offset 19, -20
+ 100              		.cfi_offset 23, -36
+ 101              		.cfi_offset 1, -4
+ 102              		.cfi_offset 8, -8
+ 103              		.cfi_offset 9, -12
+ 104              		.cfi_offset 20, -24
+ 105              		.cfi_offset 21, -28
+ 106              		.cfi_offset 22, -32
+ 107              		.cfi_offset 24, -40
+ 108              		.cfi_offset 25, -44
+  53:delay.c       **** 	uint64_t start_mtime, delta_mtime;
+ 109              		.loc 1 53 1
+ 110 0018 AA8B     		mv	s7,a0
+ 111              		.loc 1 57 17
+ 112 001a 97000000 		call	get_timer_value
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 4
+
+
+ 112      E7800000 
+ 113              	.LVL6:
+ 114 0022 2A89     		mv	s2,a0
+ 115 0024 AE89     		mv	s3,a1
+ 116              	.LVL7:
+ 117              	.L8:
+  58:delay.c       **** 	do {
+ 118              		.loc 1 58 2 is_stmt 1 discriminator 1
+  59:delay.c       **** 	start_mtime = get_timer_value();
+ 119              		.loc 1 59 2 discriminator 1
+ 120              		.loc 1 59 16 is_stmt 0 discriminator 1
+ 121 0026 97000000 		call	get_timer_value
+ 121      E7800000 
+ 122              	.LVL8:
+ 123 002e 2A84     		mv	s0,a0
+ 124 0030 AE84     		mv	s1,a1
+ 125              	.LVL9:
+  60:delay.c       **** 	} while (start_mtime == tmp);
+ 126              		.loc 1 60 2 discriminator 1
+ 127 0032 6314A900 		bne	s2,a0,.L9
+ 128 0036 E388B9FE 		beq	s3,a1,.L8
+ 129              	.L9:
+ 130 003a B7070000 		lui	a5,%hi(.LC0)
+  61:delay.c       **** 
+  62:delay.c       **** 	do {
+  63:delay.c       **** 	delta_mtime = get_timer_value() - start_mtime;
+  64:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000.0 *count ));
+ 131              		.loc 1 64 38 discriminator 1
+ 132 003e 03A90700 		lw	s2,%lo(.LC0)(a5)
+ 133              	.LVL10:
+ 134 0042 83A94700 		lw	s3,%lo(.LC0+4)(a5)
+ 135 0046 370B0000 		lui	s6,%hi(SystemCoreClock)
+ 136              	.L10:
+  62:delay.c       **** 	delta_mtime = get_timer_value() - start_mtime;
+ 137              		.loc 1 62 2 is_stmt 1 discriminator 1
+  63:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000.0 *count ));
+ 138              		.loc 1 63 2 discriminator 1
+  63:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000.0 *count ));
+ 139              		.loc 1 63 16 is_stmt 0 discriminator 1
+ 140 004a 97000000 		call	get_timer_value
+ 140      E7800000 
+ 141              	.LVL11:
+ 142 0052 AA87     		mv	a5,a0
+ 143              	.LVL12:
+  63:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000.0 *count ));
+ 144              		.loc 1 63 14 discriminator 1
+ 145 0054 018D     		sub	a0,a0,s0
+ 146              	.LVL13:
+ 147 0056 B3B7A700 		sgtu	a5,a0,a5
+ 148              	.LVL14:
+ 149 005a 858D     		sub	a1,a1,s1
+ 150              		.loc 1 64 21 discriminator 1
+ 151 005c 9D8D     		sub	a1,a1,a5
+ 152 005e 97000000 		call	__floatundidf
+ 152      E7800000 
+ 153              	.LVL15:
+ 154 0066 2A8A     		mv	s4,a0
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 5
+
+
+ 155              		.loc 1 64 38 discriminator 1
+ 156 0068 03250B00 		lw	a0,%lo(SystemCoreClock)(s6)
+ 157              		.loc 1 64 21 discriminator 1
+ 158 006c AE8A     		mv	s5,a1
+ 159              		.loc 1 64 38 discriminator 1
+ 160 006e 97000000 		call	__floatunsidf
+ 160      E7800000 
+ 161              	.LVL16:
+ 162 0076 4A86     		mv	a2,s2
+ 163 0078 CE86     		mv	a3,s3
+ 164 007a 97000000 		call	__divdf3
+ 164      E7800000 
+ 165              	.LVL17:
+ 166 0082 2A8C     		mv	s8,a0
+ 167              		.loc 1 64 46 discriminator 1
+ 168 0084 5E85     		mv	a0,s7
+ 169              		.loc 1 64 38 discriminator 1
+ 170 0086 AE8C     		mv	s9,a1
+ 171              		.loc 1 64 46 discriminator 1
+ 172 0088 97000000 		call	__floatunsidf
+ 172      E7800000 
+ 173              	.LVL18:
+ 174 0090 2A86     		mv	a2,a0
+ 175 0092 AE86     		mv	a3,a1
+ 176 0094 6285     		mv	a0,s8
+ 177 0096 E685     		mv	a1,s9
+ 178 0098 97000000 		call	__muldf3
+ 178      E7800000 
+ 179              	.LVL19:
+ 180              		.loc 1 64 2 discriminator 1
+ 181 00a0 2A86     		mv	a2,a0
+ 182 00a2 AE86     		mv	a3,a1
+ 183 00a4 5285     		mv	a0,s4
+ 184 00a6 D685     		mv	a1,s5
+ 185 00a8 97000000 		call	__ltdf2
+ 185      E7800000 
+ 186              	.LVL20:
+ 187 00b0 E34D05F8 		blt	a0,zero,.L10
+  65:delay.c       **** }
+ 188              		.loc 1 65 1
+ 189 00b4 B250     		lw	ra,44(sp)
+ 190              		.cfi_restore 1
+ 191 00b6 2254     		lw	s0,40(sp)
+ 192              		.cfi_restore 8
+ 193              	.LVL21:
+ 194 00b8 9254     		lw	s1,36(sp)
+ 195              		.cfi_restore 9
+ 196 00ba 0259     		lw	s2,32(sp)
+ 197              		.cfi_restore 18
+ 198 00bc F249     		lw	s3,28(sp)
+ 199              		.cfi_restore 19
+ 200 00be 624A     		lw	s4,24(sp)
+ 201              		.cfi_restore 20
+ 202 00c0 D24A     		lw	s5,20(sp)
+ 203              		.cfi_restore 21
+ 204 00c2 424B     		lw	s6,16(sp)
+ 205              		.cfi_restore 22
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 6
+
+
+ 206 00c4 B24B     		lw	s7,12(sp)
+ 207              		.cfi_restore 23
+ 208              	.LVL22:
+ 209 00c6 224C     		lw	s8,8(sp)
+ 210              		.cfi_restore 24
+ 211 00c8 924C     		lw	s9,4(sp)
+ 212              		.cfi_restore 25
+ 213 00ca 4561     		addi	sp,sp,48
+ 214              	.LCFI3:
+ 215              		.cfi_def_cfa_offset 0
+ 216 00cc 8280     		jr	ra
+ 217              		.cfi_endproc
+ 218              	.LFE3:
+ 220              		.section	.text.time_since_start,"ax",@progbits
+ 221              		.align	1
+ 222              		.globl	time_since_start
+ 224              	time_since_start:
+ 225              	.LFB4:
+  66:delay.c       **** 
+  67:delay.c       **** uint64_t time_since_start (void)
+  68:delay.c       **** {
+ 226              		.loc 1 68 1 is_stmt 1
+ 227              		.cfi_startproc
+  69:delay.c       ****     uint64_t start_mtime, delta_mtime;
+ 228              		.loc 1 69 5
+  70:delay.c       ****     
+  71:delay.c       ****     uint64_t tmp = get_timer_value();
+ 229              		.loc 1 71 5
+  68:delay.c       ****     uint64_t start_mtime, delta_mtime;
+ 230              		.loc 1 68 1 is_stmt 0
+ 231 0000 4111     		addi	sp,sp,-16
+ 232              	.LCFI4:
+ 233              		.cfi_def_cfa_offset 16
+ 234 0002 22C4     		sw	s0,8(sp)
+ 235 0004 26C2     		sw	s1,4(sp)
+ 236 0006 06C6     		sw	ra,12(sp)
+ 237              		.cfi_offset 8, -8
+ 238              		.cfi_offset 9, -12
+ 239              		.cfi_offset 1, -4
+ 240              		.loc 1 71 20
+ 241 0008 97000000 		call	get_timer_value
+ 241      E7800000 
+ 242              	.LVL23:
+ 243 0010 2A84     		mv	s0,a0
+ 244 0012 AE84     		mv	s1,a1
+ 245              	.LVL24:
+ 246              	.L14:
+  72:delay.c       **** 	do {
+ 247              		.loc 1 72 2 is_stmt 1 discriminator 1
+  73:delay.c       **** 	start_mtime = get_timer_value();
+ 248              		.loc 1 73 2 discriminator 1
+ 249              		.loc 1 73 16 is_stmt 0 discriminator 1
+ 250 0014 97000000 		call	get_timer_value
+ 250      E7800000 
+ 251              	.LVL25:
+  74:delay.c       **** 	} while (start_mtime == tmp);
+ 252              		.loc 1 74 2 discriminator 1
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 7
+
+
+ 253 001c 6314A400 		bne	s0,a0,.L13
+ 254 0020 E38AB4FE 		beq	s1,a1,.L14
+ 255              	.L13:
+  75:delay.c       **** 
+  76:delay.c       ****     return start_mtime;
+  77:delay.c       **** }
+ 256              		.loc 1 77 1
+ 257 0024 B240     		lw	ra,12(sp)
+ 258              		.cfi_restore 1
+ 259 0026 2244     		lw	s0,8(sp)
+ 260              		.cfi_restore 8
+ 261              	.LVL26:
+ 262 0028 9244     		lw	s1,4(sp)
+ 263              		.cfi_restore 9
+ 264 002a 4101     		addi	sp,sp,16
+ 265              	.LCFI5:
+ 266              		.cfi_def_cfa_offset 0
+ 267 002c 8280     		jr	ra
+ 268              		.cfi_endproc
+ 269              	.LFE4:
+ 271              		.section	.text.time_start,"ax",@progbits
+ 272              		.align	1
+ 273              		.globl	time_start
+ 275              	time_start:
+ 276              	.LFB5:
+  78:delay.c       **** 
+  79:delay.c       **** uint64_t time_start (void)
+  80:delay.c       **** {
+ 277              		.loc 1 80 1 is_stmt 1
+ 278              		.cfi_startproc
+  81:delay.c       **** 
+  82:delay.c       **** }
+ 279              		.loc 1 82 1
+ 280 0000 8280     		ret
+ 281              		.cfi_endproc
+ 282              	.LFE5:
+ 284              		.section	.text.delay_1us,"ax",@progbits
+ 285              		.align	1
+ 286              		.globl	delay_1us
+ 288              	delay_1us:
+ 289              	.LFB6:
+  83:delay.c       **** 
+  84:delay.c       **** void delay_1us(uint32_t count)
+  85:delay.c       **** {
+ 290              		.loc 1 85 1
+ 291              		.cfi_startproc
+ 292              	.LVL27:
+  86:delay.c       **** 	uint64_t start_mtime, delta_mtime;
+ 293              		.loc 1 86 2
+  87:delay.c       **** 
+  88:delay.c       **** 	// Don't start measuruing until we see an mtime tick
+  89:delay.c       **** 	uint64_t tmp = get_timer_value();
+ 294              		.loc 1 89 2
+  85:delay.c       **** 	uint64_t start_mtime, delta_mtime;
+ 295              		.loc 1 85 1 is_stmt 0
+ 296 0000 7971     		addi	sp,sp,-48
+ 297              	.LCFI6:
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 8
+
+
+ 298              		.cfi_def_cfa_offset 48
+ 299 0002 4AD0     		sw	s2,32(sp)
+ 300 0004 4ECE     		sw	s3,28(sp)
+ 301 0006 5EC6     		sw	s7,12(sp)
+ 302 0008 06D6     		sw	ra,44(sp)
+ 303 000a 22D4     		sw	s0,40(sp)
+ 304 000c 26D2     		sw	s1,36(sp)
+ 305 000e 52CC     		sw	s4,24(sp)
+ 306 0010 56CA     		sw	s5,20(sp)
+ 307 0012 5AC8     		sw	s6,16(sp)
+ 308 0014 62C4     		sw	s8,8(sp)
+ 309 0016 66C2     		sw	s9,4(sp)
+ 310              		.cfi_offset 18, -16
+ 311              		.cfi_offset 19, -20
+ 312              		.cfi_offset 23, -36
+ 313              		.cfi_offset 1, -4
+ 314              		.cfi_offset 8, -8
+ 315              		.cfi_offset 9, -12
+ 316              		.cfi_offset 20, -24
+ 317              		.cfi_offset 21, -28
+ 318              		.cfi_offset 22, -32
+ 319              		.cfi_offset 24, -40
+ 320              		.cfi_offset 25, -44
+  85:delay.c       **** 	uint64_t start_mtime, delta_mtime;
+ 321              		.loc 1 85 1
+ 322 0018 AA8B     		mv	s7,a0
+ 323              		.loc 1 89 17
+ 324 001a 97000000 		call	get_timer_value
+ 324      E7800000 
+ 325              	.LVL28:
+ 326 0022 2A89     		mv	s2,a0
+ 327 0024 AE89     		mv	s3,a1
+ 328              	.LVL29:
+ 329              	.L19:
+  90:delay.c       **** 	do {
+ 330              		.loc 1 90 2 is_stmt 1 discriminator 1
+  91:delay.c       **** 	start_mtime = get_timer_value();
+ 331              		.loc 1 91 2 discriminator 1
+ 332              		.loc 1 91 16 is_stmt 0 discriminator 1
+ 333 0026 97000000 		call	get_timer_value
+ 333      E7800000 
+ 334              	.LVL30:
+ 335 002e 2A84     		mv	s0,a0
+ 336 0030 AE84     		mv	s1,a1
+ 337              	.LVL31:
+  92:delay.c       **** 	} while (start_mtime == tmp);
+ 338              		.loc 1 92 2 discriminator 1
+ 339 0032 6314A900 		bne	s2,a0,.L20
+ 340 0036 E388B9FE 		beq	s3,a1,.L19
+ 341              	.L20:
+ 342 003a B7070000 		lui	a5,%hi(.LC1)
+  93:delay.c       **** 
+  94:delay.c       **** 	do {
+  95:delay.c       **** 	delta_mtime = get_timer_value() - start_mtime;
+  96:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000000.0 *count ));
+ 343              		.loc 1 96 38 discriminator 1
+ 344 003e 03A90700 		lw	s2,%lo(.LC1)(a5)
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 9
+
+
+ 345              	.LVL32:
+ 346 0042 83A94700 		lw	s3,%lo(.LC1+4)(a5)
+ 347 0046 370B0000 		lui	s6,%hi(SystemCoreClock)
+ 348              	.L21:
+  94:delay.c       **** 	delta_mtime = get_timer_value() - start_mtime;
+ 349              		.loc 1 94 2 is_stmt 1 discriminator 1
+  95:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000000.0 *count ));
+ 350              		.loc 1 95 2 discriminator 1
+  95:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000000.0 *count ));
+ 351              		.loc 1 95 16 is_stmt 0 discriminator 1
+ 352 004a 97000000 		call	get_timer_value
+ 352      E7800000 
+ 353              	.LVL33:
+ 354 0052 AA87     		mv	a5,a0
+ 355              	.LVL34:
+  95:delay.c       **** 	}while(delta_mtime <(SystemCoreClock/4000000.0 *count ));
+ 356              		.loc 1 95 14 discriminator 1
+ 357 0054 018D     		sub	a0,a0,s0
+ 358              	.LVL35:
+ 359 0056 B3B7A700 		sgtu	a5,a0,a5
+ 360              	.LVL36:
+ 361 005a 858D     		sub	a1,a1,s1
+ 362              		.loc 1 96 21 discriminator 1
+ 363 005c 9D8D     		sub	a1,a1,a5
+ 364 005e 97000000 		call	__floatundidf
+ 364      E7800000 
+ 365              	.LVL37:
+ 366 0066 2A8A     		mv	s4,a0
+ 367              		.loc 1 96 38 discriminator 1
+ 368 0068 03250B00 		lw	a0,%lo(SystemCoreClock)(s6)
+ 369              		.loc 1 96 21 discriminator 1
+ 370 006c AE8A     		mv	s5,a1
+ 371              		.loc 1 96 38 discriminator 1
+ 372 006e 97000000 		call	__floatunsidf
+ 372      E7800000 
+ 373              	.LVL38:
+ 374 0076 4A86     		mv	a2,s2
+ 375 0078 CE86     		mv	a3,s3
+ 376 007a 97000000 		call	__divdf3
+ 376      E7800000 
+ 377              	.LVL39:
+ 378 0082 2A8C     		mv	s8,a0
+ 379              		.loc 1 96 49 discriminator 1
+ 380 0084 5E85     		mv	a0,s7
+ 381              		.loc 1 96 38 discriminator 1
+ 382 0086 AE8C     		mv	s9,a1
+ 383              		.loc 1 96 49 discriminator 1
+ 384 0088 97000000 		call	__floatunsidf
+ 384      E7800000 
+ 385              	.LVL40:
+ 386 0090 2A86     		mv	a2,a0
+ 387 0092 AE86     		mv	a3,a1
+ 388 0094 6285     		mv	a0,s8
+ 389 0096 E685     		mv	a1,s9
+ 390 0098 97000000 		call	__muldf3
+ 390      E7800000 
+ 391              	.LVL41:
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 10
+
+
+ 392              		.loc 1 96 2 discriminator 1
+ 393 00a0 2A86     		mv	a2,a0
+ 394 00a2 AE86     		mv	a3,a1
+ 395 00a4 5285     		mv	a0,s4
+ 396 00a6 D685     		mv	a1,s5
+ 397 00a8 97000000 		call	__ltdf2
+ 397      E7800000 
+ 398              	.LVL42:
+ 399 00b0 E34D05F8 		blt	a0,zero,.L21
+  97:delay.c       **** }
+ 400              		.loc 1 97 1
+ 401 00b4 B250     		lw	ra,44(sp)
+ 402              		.cfi_restore 1
+ 403 00b6 2254     		lw	s0,40(sp)
+ 404              		.cfi_restore 8
+ 405              	.LVL43:
+ 406 00b8 9254     		lw	s1,36(sp)
+ 407              		.cfi_restore 9
+ 408 00ba 0259     		lw	s2,32(sp)
+ 409              		.cfi_restore 18
+ 410 00bc F249     		lw	s3,28(sp)
+ 411              		.cfi_restore 19
+ 412 00be 624A     		lw	s4,24(sp)
+ 413              		.cfi_restore 20
+ 414 00c0 D24A     		lw	s5,20(sp)
+ 415              		.cfi_restore 21
+ 416 00c2 424B     		lw	s6,16(sp)
+ 417              		.cfi_restore 22
+ 418 00c4 B24B     		lw	s7,12(sp)
+ 419              		.cfi_restore 23
+ 420              	.LVL44:
+ 421 00c6 224C     		lw	s8,8(sp)
+ 422              		.cfi_restore 24
+ 423 00c8 924C     		lw	s9,4(sp)
+ 424              		.cfi_restore 25
+ 425 00ca 4561     		addi	sp,sp,48
+ 426              	.LCFI7:
+ 427              		.cfi_def_cfa_offset 0
+ 428 00cc 8280     		jr	ra
+ 429              		.cfi_endproc
+ 430              	.LFE6:
+ 432              		.section	.text.delay_until_1us,"ax",@progbits
+ 433              		.align	1
+ 434              		.globl	delay_until_1us
+ 436              	delay_until_1us:
+ 437              	.LFB7:
+  98:delay.c       **** 
+  99:delay.c       **** 
+ 100:delay.c       **** void delay_until_1us(uint32_t time){
+ 438              		.loc 1 100 36 is_stmt 1
+ 439              		.cfi_startproc
+ 440              	.LVL45:
+ 101:delay.c       ****     uint64_t current_time;
+ 441              		.loc 1 101 5
+ 102:delay.c       ****     current_time = get_timer_value();
+ 442              		.loc 1 102 5
+ 100:delay.c       ****     uint64_t current_time;
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 11
+
+
+ 443              		.loc 1 100 36 is_stmt 0
+ 444 0000 4111     		addi	sp,sp,-16
+ 445              	.LCFI8:
+ 446              		.cfi_def_cfa_offset 16
+ 447 0002 22C4     		sw	s0,8(sp)
+ 448 0004 06C6     		sw	ra,12(sp)
+ 449              		.cfi_offset 8, -8
+ 450              		.cfi_offset 1, -4
+ 100:delay.c       ****     uint64_t current_time;
+ 451              		.loc 1 100 36
+ 452 0006 2A84     		mv	s0,a0
+ 453              		.loc 1 102 20
+ 454 0008 97000000 		call	get_timer_value
+ 454      E7800000 
+ 455              	.LVL46:
+ 103:delay.c       ****     delay_until = (time * (SystemCoreClock/4000)) + current_time;
+ 456              		.loc 1 103 5 is_stmt 1
+ 457              		.loc 1 103 43 is_stmt 0
+ 458 0010 B7070000 		lui	a5,%hi(SystemCoreClock)
+ 459 0014 83A70700 		lw	a5,%lo(SystemCoreClock)(a5)
+ 460 0018 0567     		li	a4,4096
+ 461 001a 130707FA 		addi	a4,a4,-96
+ 462 001e B3D7E702 		divu	a5,a5,a4
+ 104:delay.c       **** }
+ 463              		.loc 1 104 1
+ 464 0022 B240     		lw	ra,12(sp)
+ 465              		.cfi_restore 1
+ 103:delay.c       ****     delay_until = (time * (SystemCoreClock/4000)) + current_time;
+ 466              		.loc 1 103 17
+ 467 0024 37070000 		lui	a4,%hi(.LANCHOR0)
+ 468 0028 13070700 		addi	a4,a4,%lo(.LANCHOR0)
+ 103:delay.c       ****     delay_until = (time * (SystemCoreClock/4000)) + current_time;
+ 469              		.loc 1 103 25
+ 470 002c B3878702 		mul	a5,a5,s0
+ 471              		.loc 1 104 1
+ 472 0030 2244     		lw	s0,8(sp)
+ 473              		.cfi_restore 8
+ 474              	.LVL47:
+ 103:delay.c       ****     delay_until = (time * (SystemCoreClock/4000)) + current_time;
+ 475              		.loc 1 103 51
+ 476 0032 3E95     		add	a0,a5,a0
+ 477              	.LVL48:
+ 478 0034 B337F500 		sltu	a5,a0,a5
+ 479 0038 AE97     		add	a5,a5,a1
+ 103:delay.c       ****     delay_until = (time * (SystemCoreClock/4000)) + current_time;
+ 480              		.loc 1 103 17
+ 481 003a 08C3     		sw	a0,0(a4)
+ 482 003c 5CC3     		sw	a5,4(a4)
+ 483              		.loc 1 104 1
+ 484 003e 4101     		addi	sp,sp,16
+ 485              	.LCFI9:
+ 486              		.cfi_def_cfa_offset 0
+ 487 0040 8280     		jr	ra
+ 488              		.cfi_endproc
+ 489              	.LFE7:
+ 491              		.section	.text.delay_until_1ms,"ax",@progbits
+ 492              		.align	1
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 12
+
+
+ 493              		.globl	delay_until_1ms
+ 495              	delay_until_1ms:
+ 496              	.LFB8:
+ 105:delay.c       **** 
+ 106:delay.c       **** void delay_until_1ms(uint32_t time){
+ 497              		.loc 1 106 36 is_stmt 1
+ 498              		.cfi_startproc
+ 499              	.LVL49:
+ 107:delay.c       ****     uint64_t current_time;
+ 500              		.loc 1 107 5
+ 108:delay.c       ****     current_time = get_timer_value();
+ 501              		.loc 1 108 5
+ 106:delay.c       ****     uint64_t current_time;
+ 502              		.loc 1 106 36 is_stmt 0
+ 503 0000 4111     		addi	sp,sp,-16
+ 504              	.LCFI10:
+ 505              		.cfi_def_cfa_offset 16
+ 506 0002 22C4     		sw	s0,8(sp)
+ 507 0004 06C6     		sw	ra,12(sp)
+ 508              		.cfi_offset 8, -8
+ 509              		.cfi_offset 1, -4
+ 106:delay.c       ****     uint64_t current_time;
+ 510              		.loc 1 106 36
+ 511 0006 2A84     		mv	s0,a0
+ 512              		.loc 1 108 20
+ 513 0008 97000000 		call	get_timer_value
+ 513      E7800000 
+ 514              	.LVL50:
+ 109:delay.c       ****     delay_until = (time * (SystemCoreClock/4000000)) + current_time;
+ 515              		.loc 1 109 5 is_stmt 1
+ 516              		.loc 1 109 43 is_stmt 0
+ 517 0010 B7070000 		lui	a5,%hi(SystemCoreClock)
+ 518 0014 83A70700 		lw	a5,%lo(SystemCoreClock)(a5)
+ 519 0018 37173D00 		li	a4,4001792
+ 520 001c 13070790 		addi	a4,a4,-1792
+ 521 0020 B3D7E702 		divu	a5,a5,a4
+ 110:delay.c       **** }
+ 522              		.loc 1 110 1
+ 523 0024 B240     		lw	ra,12(sp)
+ 524              		.cfi_restore 1
+ 109:delay.c       ****     delay_until = (time * (SystemCoreClock/4000000)) + current_time;
+ 525              		.loc 1 109 17
+ 526 0026 37070000 		lui	a4,%hi(.LANCHOR0)
+ 527 002a 13070700 		addi	a4,a4,%lo(.LANCHOR0)
+ 109:delay.c       ****     delay_until = (time * (SystemCoreClock/4000000)) + current_time;
+ 528              		.loc 1 109 25
+ 529 002e B3878702 		mul	a5,a5,s0
+ 530              		.loc 1 110 1
+ 531 0032 2244     		lw	s0,8(sp)
+ 532              		.cfi_restore 8
+ 533              	.LVL51:
+ 109:delay.c       ****     delay_until = (time * (SystemCoreClock/4000000)) + current_time;
+ 534              		.loc 1 109 54
+ 535 0034 3E95     		add	a0,a5,a0
+ 536              	.LVL52:
+ 537 0036 B337F500 		sltu	a5,a0,a5
+ 538 003a AE97     		add	a5,a5,a1
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 13
+
+
+ 109:delay.c       ****     delay_until = (time * (SystemCoreClock/4000000)) + current_time;
+ 539              		.loc 1 109 17
+ 540 003c 08C3     		sw	a0,0(a4)
+ 541 003e 5CC3     		sw	a5,4(a4)
+ 542              		.loc 1 110 1
+ 543 0040 4101     		addi	sp,sp,16
+ 544              	.LCFI11:
+ 545              		.cfi_def_cfa_offset 0
+ 546 0042 8280     		jr	ra
+ 547              		.cfi_endproc
+ 548              	.LFE8:
+ 550              		.section	.text.delay_finished,"ax",@progbits
+ 551              		.align	1
+ 552              		.globl	delay_finished
+ 554              	delay_finished:
+ 555              	.LFB9:
+ 111:delay.c       **** 
+ 112:delay.c       **** int delay_finished(){
+ 556              		.loc 1 112 21 is_stmt 1
+ 557              		.cfi_startproc
+ 113:delay.c       ****     uint64_t time;
+ 558              		.loc 1 113 5
+ 114:delay.c       ****     time = get_timer_value();
+ 559              		.loc 1 114 5
+ 112:delay.c       ****     uint64_t time;
+ 560              		.loc 1 112 21 is_stmt 0
+ 561 0000 4111     		addi	sp,sp,-16
+ 562              	.LCFI12:
+ 563              		.cfi_def_cfa_offset 16
+ 564 0002 06C6     		sw	ra,12(sp)
+ 565              		.cfi_offset 1, -4
+ 566              		.loc 1 114 12
+ 567 0004 97000000 		call	get_timer_value
+ 567      E7800000 
+ 568              	.LVL53:
+ 115:delay.c       ****     if(time < delay_until) return 1;
+ 569              		.loc 1 115 5 is_stmt 1
+ 570              		.loc 1 115 13 is_stmt 0
+ 571 000c B7070000 		lui	a5,%hi(.LANCHOR0)
+ 572 0010 93870700 		addi	a5,a5,%lo(.LANCHOR0)
+ 573              		.loc 1 115 7
+ 574 0014 D843     		lw	a4,4(a5)
+ 575 0016 63EFE500 		bgtu	a4,a1,.L31
+ 576 001a 630AB700 		beq	a4,a1,.L34
+ 577              	.L32:
+ 116:delay.c       ****     else delay_until = 0; return 0;
+ 578              		.loc 1 116 10 is_stmt 1
+ 117:delay.c       **** }...
+ 579              		.loc 1 117 1 is_stmt 0
+ 580 001e B240     		lw	ra,12(sp)
+ 581              		.cfi_remember_state
+ 582              		.cfi_restore 1
+ 116:delay.c       ****     else delay_until = 0; return 0;
+ 583              		.loc 1 116 22
+ 584 0020 8146     		li	a3,0
+ 585 0022 0147     		li	a4,0
+ 586 0024 94C3     		sw	a3,0(a5)
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 14
+
+
+ 587 0026 D8C3     		sw	a4,4(a5)
+ 116:delay.c       ****     else delay_until = 0; return 0;
+ 588              		.loc 1 116 27 is_stmt 1
+ 116:delay.c       ****     else delay_until = 0; return 0;
+ 589              		.loc 1 116 34 is_stmt 0
+ 590 0028 0145     		li	a0,0
+ 591              	.LVL54:
+ 592              		.loc 1 117 1
+ 593 002a 4101     		addi	sp,sp,16
+ 594              	.LCFI13:
+ 595              		.cfi_def_cfa_offset 0
+ 596 002c 8280     		jr	ra
+ 597              	.LVL55:
+ 598              	.L34:
+ 599              	.LCFI14:
+ 600              		.cfi_restore_state
+ 115:delay.c       ****     if(time < delay_until) return 1;
+ 601              		.loc 1 115 7
+ 602 002e 9843     		lw	a4,0(a5)
+ 603 0030 E377E5FE 		bleu	a4,a0,.L32
+ 604              	.L31:
+ 605              		.loc 1 117 1
+ 606 0034 B240     		lw	ra,12(sp)
+ 607              		.cfi_restore 1
+ 115:delay.c       ****     if(time < delay_until) return 1;
+ 608              		.loc 1 115 35
+ 609 0036 0545     		li	a0,1
+ 610              	.LVL56:
+ 611              		.loc 1 117 1
+ 612 0038 4101     		addi	sp,sp,16
+ 613              	.LCFI15:
+ 614              		.cfi_def_cfa_offset 0
+ 615 003a 8280     		jr	ra
+ 616              		.cfi_endproc
+ 617              	.LFE9:
+ 619              		.globl	delay_until
+ 620              		.section	.rodata.delay_1ms.cst8,"aM",@progbits,8
+ 621              		.align	3
+ 622              	.LC0:
+ 623 0000 00000000 		.word	0
+ 624 0004 0040AF40 		.word	1085227008
+ 625              		.section	.rodata.delay_1us.cst8,"aM",@progbits,8
+ 626              		.align	3
+ 627              	.LC1:
+ 628 0000 00000000 		.word	0
+ 629 0004 80844E41 		.word	1095664768
+ 630              		.section	.sbss.delay_until,"aw",@nobits
+ 631              		.align	3
+ 632              		.set	.LANCHOR0,. + 0
+ 635              	delay_until:
+ 636 0000 00000000 		.zero	8
+ 636      00000000 
+ 637              		.text
+ 638              	.Letext0:
+ 639              		.file 2 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+ 640              		.file 3 "c:\\toolchain-gd32v-win-001\\toolchain-gd32v-win\\compiler\\riscv64-unknown-elf\\include\
+ 641              		.file 4 "../../firmware/GD32VF103_standard_peripheral/system_gd32vf103.h"
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 15
+
+
+ 642              		.file 5 "../../firmware/RISCV/drivers/n200_func.h"
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 16
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 delay.c
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:13     .text.delay_7812us:0000000000000000 delay_7812us
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:17     .text.delay_7812us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:19     .text.delay_7812us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:20     .text.delay_7812us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:21     .text.delay_7812us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:23     .text.delay_7812us:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:25     .text.delay_7812us:0000000000000004 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:27     .text.delay_7812us:0000000000000004 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:33     .text.delay_7812us:0000000000000010 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:35     .text.delay_7812us:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:36     .text.delay_7812us:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:38     .text.delay_7812us:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:42     .text.delay_7812us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:43     .text.delay_7812us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:44     .text.delay_7812us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:45     .text.delay_7812us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:48     .text.delay_7812us:0000000000000020 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:53     .text.delay_7812us:000000000000002c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:54     .text.delay_7812us:000000000000002e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:56     .text.delay_7812us:0000000000000030 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:59     .text.delay_7812us:0000000000000032 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:62     .text.delay_7812us:0000000000000034 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:64     .text.delay_7812us:0000000000000036 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:76     .text.delay_1ms:0000000000000000 delay_1ms
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:79     .text.delay_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:81     .text.delay_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:82     .text.delay_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:83     .text.delay_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:84     .text.delay_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:86     .text.delay_1ms:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:98     .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:99     .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:100    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:101    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:102    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:103    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:104    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:105    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:106    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:107    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:108    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:110    .text.delay_1ms:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:112    .text.delay_1ms:000000000000001a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:119    .text.delay_1ms:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:120    .text.delay_1ms:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:121    .text.delay_1ms:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:127    .text.delay_1ms:0000000000000032 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:132    .text.delay_1ms:000000000000003e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:138    .text.delay_1ms:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:139    .text.delay_1ms:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:140    .text.delay_1ms:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:145    .text.delay_1ms:0000000000000054 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:151    .text.delay_1ms:000000000000005c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:156    .text.delay_1ms:0000000000000068 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:158    .text.delay_1ms:000000000000006c .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 17
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:160    .text.delay_1ms:000000000000006e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:168    .text.delay_1ms:0000000000000084 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:170    .text.delay_1ms:0000000000000086 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:172    .text.delay_1ms:0000000000000088 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:181    .text.delay_1ms:00000000000000a0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:189    .text.delay_1ms:00000000000000b4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:190    .text.delay_1ms:00000000000000b6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:192    .text.delay_1ms:00000000000000b8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:195    .text.delay_1ms:00000000000000ba .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:197    .text.delay_1ms:00000000000000bc .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:199    .text.delay_1ms:00000000000000be .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:201    .text.delay_1ms:00000000000000c0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:203    .text.delay_1ms:00000000000000c2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:205    .text.delay_1ms:00000000000000c4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:207    .text.delay_1ms:00000000000000c6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:210    .text.delay_1ms:00000000000000c8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:212    .text.delay_1ms:00000000000000ca .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:215    .text.delay_1ms:00000000000000cc .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:217    .text.delay_1ms:00000000000000ce .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:224    .text.time_since_start:0000000000000000 time_since_start
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:227    .text.time_since_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:228    .text.time_since_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:229    .text.time_since_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:230    .text.time_since_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:231    .text.time_since_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:233    .text.time_since_start:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:237    .text.time_since_start:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:238    .text.time_since_start:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:239    .text.time_since_start:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:241    .text.time_since_start:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:248    .text.time_since_start:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:249    .text.time_since_start:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:250    .text.time_since_start:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:253    .text.time_since_start:000000000000001c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:257    .text.time_since_start:0000000000000024 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:258    .text.time_since_start:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:260    .text.time_since_start:0000000000000028 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:263    .text.time_since_start:000000000000002a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:266    .text.time_since_start:000000000000002c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:268    .text.time_since_start:000000000000002e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:275    .text.time_start:0000000000000000 time_start
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:278    .text.time_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:279    .text.time_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:280    .text.time_start:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:281    .text.time_start:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:288    .text.delay_1us:0000000000000000 delay_1us
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:291    .text.delay_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:293    .text.delay_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:294    .text.delay_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:295    .text.delay_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:296    .text.delay_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:298    .text.delay_1us:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:310    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:311    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:312    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:313    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:314    .text.delay_1us:0000000000000018 .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 18
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:315    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:316    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:317    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:318    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:319    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:320    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:322    .text.delay_1us:0000000000000018 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:324    .text.delay_1us:000000000000001a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:331    .text.delay_1us:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:332    .text.delay_1us:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:333    .text.delay_1us:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:339    .text.delay_1us:0000000000000032 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:344    .text.delay_1us:000000000000003e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:350    .text.delay_1us:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:351    .text.delay_1us:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:352    .text.delay_1us:000000000000004a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:357    .text.delay_1us:0000000000000054 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:363    .text.delay_1us:000000000000005c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:368    .text.delay_1us:0000000000000068 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:370    .text.delay_1us:000000000000006c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:372    .text.delay_1us:000000000000006e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:380    .text.delay_1us:0000000000000084 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:382    .text.delay_1us:0000000000000086 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:384    .text.delay_1us:0000000000000088 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:393    .text.delay_1us:00000000000000a0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:401    .text.delay_1us:00000000000000b4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:402    .text.delay_1us:00000000000000b6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:404    .text.delay_1us:00000000000000b8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:407    .text.delay_1us:00000000000000ba .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:409    .text.delay_1us:00000000000000bc .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:411    .text.delay_1us:00000000000000be .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:413    .text.delay_1us:00000000000000c0 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:415    .text.delay_1us:00000000000000c2 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:417    .text.delay_1us:00000000000000c4 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:419    .text.delay_1us:00000000000000c6 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:422    .text.delay_1us:00000000000000c8 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:424    .text.delay_1us:00000000000000ca .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:427    .text.delay_1us:00000000000000cc .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:429    .text.delay_1us:00000000000000ce .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:436    .text.delay_until_1us:0000000000000000 delay_until_1us
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:439    .text.delay_until_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:441    .text.delay_until_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:442    .text.delay_until_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:443    .text.delay_until_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:444    .text.delay_until_1us:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:446    .text.delay_until_1us:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:449    .text.delay_until_1us:0000000000000006 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:450    .text.delay_until_1us:0000000000000006 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:452    .text.delay_until_1us:0000000000000006 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:454    .text.delay_until_1us:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:457    .text.delay_until_1us:0000000000000010 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:458    .text.delay_until_1us:0000000000000010 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:464    .text.delay_until_1us:0000000000000022 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:465    .text.delay_until_1us:0000000000000024 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:467    .text.delay_until_1us:0000000000000024 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:470    .text.delay_until_1us:000000000000002c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:472    .text.delay_until_1us:0000000000000030 .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 19
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:473    .text.delay_until_1us:0000000000000032 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:476    .text.delay_until_1us:0000000000000032 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:481    .text.delay_until_1us:000000000000003a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:484    .text.delay_until_1us:000000000000003e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:486    .text.delay_until_1us:0000000000000040 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:488    .text.delay_until_1us:0000000000000042 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:495    .text.delay_until_1ms:0000000000000000 delay_until_1ms
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:498    .text.delay_until_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:500    .text.delay_until_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:501    .text.delay_until_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:502    .text.delay_until_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:503    .text.delay_until_1ms:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:505    .text.delay_until_1ms:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:508    .text.delay_until_1ms:0000000000000006 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:509    .text.delay_until_1ms:0000000000000006 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:511    .text.delay_until_1ms:0000000000000006 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:513    .text.delay_until_1ms:0000000000000008 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:516    .text.delay_until_1ms:0000000000000010 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:517    .text.delay_until_1ms:0000000000000010 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:523    .text.delay_until_1ms:0000000000000024 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:524    .text.delay_until_1ms:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:526    .text.delay_until_1ms:0000000000000026 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:529    .text.delay_until_1ms:000000000000002e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:531    .text.delay_until_1ms:0000000000000032 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:532    .text.delay_until_1ms:0000000000000034 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:535    .text.delay_until_1ms:0000000000000034 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:540    .text.delay_until_1ms:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:543    .text.delay_until_1ms:0000000000000040 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:545    .text.delay_until_1ms:0000000000000042 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:547    .text.delay_until_1ms:0000000000000044 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:554    .text.delay_finished:0000000000000000 delay_finished
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:557    .text.delay_finished:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:558    .text.delay_finished:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:559    .text.delay_finished:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:560    .text.delay_finished:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:561    .text.delay_finished:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:563    .text.delay_finished:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:565    .text.delay_finished:0000000000000004 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:567    .text.delay_finished:0000000000000004 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:570    .text.delay_finished:000000000000000c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:571    .text.delay_finished:000000000000000c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:574    .text.delay_finished:0000000000000014 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:579    .text.delay_finished:000000000000001e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:580    .text.delay_finished:000000000000001e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:581    .text.delay_finished:0000000000000020 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:582    .text.delay_finished:0000000000000020 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:584    .text.delay_finished:0000000000000020 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:589    .text.delay_finished:0000000000000028 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:590    .text.delay_finished:0000000000000028 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:593    .text.delay_finished:000000000000002a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:595    .text.delay_finished:000000000000002c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:600    .text.delay_finished:000000000000002e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:602    .text.delay_finished:000000000000002e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:606    .text.delay_finished:0000000000000034 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:607    .text.delay_finished:0000000000000036 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:609    .text.delay_finished:0000000000000036 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:612    .text.delay_finished:0000000000000038 .L0 
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 20
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:614    .text.delay_finished:000000000000003a .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:616    .text.delay_finished:000000000000003c .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:635    .sbss.delay_until:0000000000000000 delay_until
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:632    .sbss.delay_until:0000000000000000 .LANCHOR0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:72     .text.delay_7812us:0000000000000036 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:220    .text.delay_1ms:00000000000000ce .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:271    .text.time_since_start:000000000000002e .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:284    .text.time_start:0000000000000002 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:432    .text.delay_1us:00000000000000ce .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:491    .text.delay_until_1us:0000000000000042 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:550    .text.delay_until_1ms:0000000000000044 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:620    .text.delay_finished:000000000000003c .L0 
+                     .debug_frame:0000000000000000 .L0 
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:41     .text.delay_7812us:0000000000000018 .L4
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:51     .text.delay_7812us:000000000000002c .L1
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:622    .rodata.delay_1ms.cst8:0000000000000000 .LC0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:129    .text.delay_1ms:000000000000003a .L9
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:117    .text.delay_1ms:0000000000000026 .L8
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:136    .text.delay_1ms:000000000000004a .L10
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:255    .text.time_since_start:0000000000000024 .L13
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:246    .text.time_since_start:0000000000000014 .L14
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:627    .rodata.delay_1us.cst8:0000000000000000 .LC1
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:341    .text.delay_1us:000000000000003a .L20
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:329    .text.delay_1us:0000000000000026 .L19
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:348    .text.delay_1us:000000000000004a .L21
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:604    .text.delay_finished:0000000000000034 .L31
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:598    .text.delay_finished:000000000000002e .L34
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:577    .text.delay_finished:000000000000001e .L32
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1037   .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1791   .debug_str:000000000000000c .LASF30
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1843   .debug_str:00000000000001ed .LASF31
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1819   .debug_str:0000000000000125 .LASF32
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1767   .debug_ranges:0000000000000000 .Ldebug_ranges0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1787   .debug_line:0000000000000000 .Ldebug_line0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1825   .debug_str:000000000000017f .LASF0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1821   .debug_str:0000000000000162 .LASF1
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1855   .debug_str:0000000000000231 .LASF2
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1795   .debug_str:0000000000000093 .LASF7
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1817   .debug_str:0000000000000117 .LASF3
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1839   .debug_str:00000000000001d8 .LASF4
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1809   .debug_str:00000000000000e6 .LASF5
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1847   .debug_str:0000000000000206 .LASF6
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1815   .debug_str:000000000000010c .LASF8
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1807   .debug_str:00000000000000d4 .LASF9
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1833   .debug_str:00000000000001af .LASF10
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1841   .debug_str:00000000000001e2 .LASF11
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1827   .debug_str:0000000000000196 .LASF12
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1813   .debug_str:0000000000000103 .LASF13
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1803   .debug_str:00000000000000c0 .LASF14
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1835   .debug_str:00000000000001bd .LASF16
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1831   .debug_str:00000000000001a3 .LASF15
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1789   .debug_str:0000000000000000 .LASF17
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1859   .debug_str:000000000000024d .LASF18
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:555    .text.delay_finished:0000000000000000 .LFB9
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:617    .text.delay_finished:000000000000003c .LFE9
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1385   .debug_loc:0000000000000000 .LLST19
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1829   .debug_str:000000000000019e .LASF20
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 21
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1413   .debug_loc:0000000000000044 .LLST20
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:568    .text.delay_finished:000000000000000c .LVL53
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1823   .debug_str:000000000000016f .LASF19
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:496    .text.delay_until_1ms:0000000000000000 .LFB8
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:548    .text.delay_until_1ms:0000000000000044 .LFE8
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1434   .debug_loc:000000000000006c .LLST16
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1452   .debug_loc:0000000000000098 .LLST17
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1797   .debug_str:000000000000009d .LASF21
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1470   .debug_loc:00000000000000c4 .LLST18
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:514    .text.delay_until_1ms:0000000000000010 .LVL50
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1857   .debug_str:000000000000023d .LASF22
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:437    .text.delay_until_1us:0000000000000000 .LFB7
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:489    .text.delay_until_1us:0000000000000042 .LFE7
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1482   .debug_loc:00000000000000dc .LLST13
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1500   .debug_loc:0000000000000108 .LLST14
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1518   .debug_loc:0000000000000134 .LLST15
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:455    .text.delay_until_1us:0000000000000010 .LVL46
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1853   .debug_str:0000000000000227 .LASF23
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:289    .text.delay_1us:0000000000000000 .LFB6
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:430    .text.delay_1us:00000000000000ce .LFE6
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1530   .debug_loc:000000000000014c .LLST9
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1801   .debug_str:00000000000000ba .LASF24
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1548   .debug_loc:0000000000000178 .LLST10
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1851   .debug_str:000000000000021b .LASF25
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1566   .debug_loc:00000000000001a4 .LLST11
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1849   .debug_str:000000000000020f .LASF26
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1578   .debug_loc:00000000000001bc .LLST12
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:325    .text.delay_1us:0000000000000022 .LVL28
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:334    .text.delay_1us:000000000000002e .LVL30
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:353    .text.delay_1us:0000000000000052 .LVL33
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1837   .debug_str:00000000000001cd .LASF33
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:276    .text.time_start:0000000000000000 .LFB5
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:282    .text.time_start:0000000000000002 .LFE5
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1845   .debug_str:00000000000001f5 .LASF34
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:225    .text.time_since_start:0000000000000000 .LFB4
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:269    .text.time_since_start:000000000000002e .LFE4
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1590   .debug_loc:00000000000001d4 .LLST7
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1608   .debug_loc:0000000000000200 .LLST8
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:242    .text.time_since_start:0000000000000010 .LVL23
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:251    .text.time_since_start:000000000000001c .LVL25
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1811   .debug_str:00000000000000f9 .LASF27
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:77     .text.delay_1ms:0000000000000000 .LFB3
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:218    .text.delay_1ms:00000000000000ce .LFE3
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1620   .debug_loc:0000000000000218 .LLST3
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1638   .debug_loc:0000000000000244 .LLST4
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1656   .debug_loc:0000000000000270 .LLST5
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1668   .debug_loc:0000000000000288 .LLST6
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:113    .text.delay_1ms:0000000000000022 .LVL6
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:122    .text.delay_1ms:000000000000002e .LVL8
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:141    .text.delay_1ms:0000000000000052 .LVL11
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1793   .debug_str:0000000000000086 .LASF28
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:14     .text.delay_7812us:0000000000000000 .LFB2
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:65     .text.delay_7812us:0000000000000036 .LFE2
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1680   .debug_loc:00000000000002a0 .LLST0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1698   .debug_loc:00000000000002cc .LLST1
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1805   .debug_str:00000000000000c9 .LASF29
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1728   .debug_loc:0000000000000304 .LLST2
+GAS LISTING C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s 			page 22
+
+
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:46     .text.delay_7812us:0000000000000020 .LVL3
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:1799   .debug_str:00000000000000aa .LASF35
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:562    .text.delay_finished:0000000000000002 .LCFI12
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:594    .text.delay_finished:000000000000002c .LCFI13
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:599    .text.delay_finished:000000000000002e .LCFI14
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:613    .text.delay_finished:000000000000003a .LCFI15
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:591    .text.delay_finished:000000000000002a .LVL54
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:597    .text.delay_finished:000000000000002e .LVL55
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:610    .text.delay_finished:0000000000000038 .LVL56
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:504    .text.delay_until_1ms:0000000000000002 .LCFI10
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:544    .text.delay_until_1ms:0000000000000042 .LCFI11
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:499    .text.delay_until_1ms:0000000000000000 .LVL49
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:533    .text.delay_until_1ms:0000000000000034 .LVL51
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:536    .text.delay_until_1ms:0000000000000036 .LVL52
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:445    .text.delay_until_1us:0000000000000002 .LCFI8
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:485    .text.delay_until_1us:0000000000000040 .LCFI9
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:440    .text.delay_until_1us:0000000000000000 .LVL45
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:474    .text.delay_until_1us:0000000000000032 .LVL47
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:477    .text.delay_until_1us:0000000000000034 .LVL48
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:297    .text.delay_1us:0000000000000002 .LCFI6
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:426    .text.delay_1us:00000000000000cc .LCFI7
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:292    .text.delay_1us:0000000000000000 .LVL27
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:420    .text.delay_1us:00000000000000c6 .LVL44
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:337    .text.delay_1us:0000000000000032 .LVL31
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:405    .text.delay_1us:00000000000000b8 .LVL43
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:328    .text.delay_1us:0000000000000026 .LVL29
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:345    .text.delay_1us:0000000000000042 .LVL32
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:232    .text.time_since_start:0000000000000002 .LCFI4
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:265    .text.time_since_start:000000000000002c .LCFI5
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:245    .text.time_since_start:0000000000000014 .LVL24
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:261    .text.time_since_start:0000000000000028 .LVL26
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:85     .text.delay_1ms:0000000000000002 .LCFI2
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:214    .text.delay_1ms:00000000000000cc .LCFI3
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:80     .text.delay_1ms:0000000000000000 .LVL5
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:208    .text.delay_1ms:00000000000000c6 .LVL22
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:125    .text.delay_1ms:0000000000000032 .LVL9
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:193    .text.delay_1ms:00000000000000b8 .LVL21
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:116    .text.delay_1ms:0000000000000026 .LVL7
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:133    .text.delay_1ms:0000000000000042 .LVL10
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:22     .text.delay_7812us:0000000000000002 .LCFI0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:61     .text.delay_7812us:0000000000000034 .LCFI1
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:18     .text.delay_7812us:0000000000000000 .LVL0
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:31     .text.delay_7812us:0000000000000010 .LVL1
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:39     .text.delay_7812us:0000000000000018 .LVL2
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:57     .text.delay_7812us:0000000000000030 .LVL4
+C:\Users\Jesper\AppData\Local\Temp\ccxcdXUd.s:644    .debug_info:0000000000000000 .Ldebug_info0
+
+UNDEFINED SYMBOLS
+get_timer_value
+__floatundidf
+__floatunsidf
+__divdf3
+__muldf3
+__ltdf2
+SystemCoreClock
